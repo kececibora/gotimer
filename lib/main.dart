@@ -51,20 +51,21 @@ class TimeSystemScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
+    // scheme değişkeni kullanılmadığı için kaldırdık
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'EsGo Timer',
-          style: TextStyle(fontSize: 32, fontWeight: FontWeight.w600, fontFamily: 'SF Pro Display'),
-        ),
-      ),
+      appBar: AppBar(title: Text('EsGo Timer')),
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            const SizedBox(height: 20),
+            const Text(
+              'Zaman Sistemi',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, letterSpacing: 1, fontFamily: 'SF Pro Display'),
+            ),
             const SizedBox(height: 32),
             _timeSystemButton(context, 'Byoyomi', 'Japonya • Ana Süre + Her Hamle İçin Ek Süre'),
             const SizedBox(height: 16),
@@ -85,8 +86,6 @@ class TimeSystemScreen extends StatelessWidget {
   }
 
   Widget _timeSystemButton(BuildContext context, String title, String description) {
-    final scheme = Theme.of(context).colorScheme;
-
     return InkWell(
       borderRadius: BorderRadius.circular(18),
       onTap: () {
@@ -97,12 +96,19 @@ class TimeSystemScreen extends StatelessWidget {
           color: Colors.grey[100],
           borderRadius: BorderRadius.circular(18),
           border: Border.all(color: Colors.black12, width: 1),
-          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 10, offset: const Offset(0, 4))],
+          boxShadow: [
+            BoxShadow(
+              // withOpacity deprecated → withValues
+              color: Colors.black.withValues(alpha: 0.04),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
         padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
         child: Row(
           children: [
-            Icon(Icons.timer_rounded, color: Colors.black, size: 28),
+            const Icon(Icons.timer_rounded, color: Colors.black, size: 28),
             const SizedBox(width: 16),
             Expanded(
               child: Column(
@@ -161,7 +167,7 @@ class _TimerSettingsScreenState extends State<TimerSettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
+    // scheme değişkeni kullanılmadığı için kaldırdık
 
     return Scaffold(
       appBar: AppBar(title: Text('${widget.timeSystem} Ayarları')),
@@ -448,7 +454,7 @@ class _TimerScreenState extends State<TimerScreen> {
                   children: [
                     Text(
                       _isBlackTurn ? 'Siyah' : 'Beyaz',
-                      style: TextStyle(fontSize: 26, fontWeight: FontWeight.w400, color: textColor.withOpacity(0.8), letterSpacing: 1, fontFamily: 'SF Pro Text'),
+                      style: TextStyle(fontSize: 26, fontWeight: FontWeight.w400, color: textColor.withValues(alpha: 0.8), letterSpacing: 1, fontFamily: 'SF Pro Text'),
                     ),
                     const SizedBox(height: 24),
                     Text(
@@ -460,7 +466,7 @@ class _TimerScreenState extends State<TimerScreen> {
                       Text(
                         'Byoyomi: ${_formatTime(currentByoyomi)} '
                         '(${currentByoyomiCount}x)',
-                        style: TextStyle(fontSize: 24, color: textColor.withOpacity(0.9), fontFamily: 'SF Pro Text'),
+                        style: TextStyle(fontSize: 24, color: textColor.withValues(alpha: 0.9), fontFamily: 'SF Pro Text'),
                       ),
                   ],
                 ),
@@ -495,6 +501,4 @@ class _TimerScreenState extends State<TimerScreen> {
     return '${minutes.toString().padLeft(2, '0')}:'
         '${secs.toString().padLeft(2, '0')}';
   }
-
-  int get _currentByoyomi => _isBlackTurn ? _blackByoyomiRemaining : _whiteByoyomiRemaining;
 }
