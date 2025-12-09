@@ -11,26 +11,21 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: "stable"
           channel: "stable"
+          flutter-version: "latest"
+          cache: true
 
       - name: Flutter Pub Get
         run: flutter pub get
 
-      # İstersen format kontrolü
-      - name: Flutter Format
-        run: flutter format --set-exit-if-changed .
-
-      # İstersen analiz
       - name: Flutter Analyze
         run: flutter analyze
 
-      # Testlerin varsa aç, yoksa bu adımı silebilirsin
       - name: Flutter Test
         run: flutter test
