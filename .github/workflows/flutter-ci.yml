@@ -28,5 +28,11 @@ jobs:
       - name: Flutter Analyze
         run: flutter analyze
 
-      - name: Flutter Test
-        run: flutter test
+      - name: Flutter Test (Skip If No Tests)
+        run: |
+          if [ -d "test" ]; then
+            echo "test/ klasörü bulundu, flutter test çalıştırılıyor..."
+            flutter test
+          else
+            echo "test/ klasörü bulunamadı, flutter test atlanıyor."
+          fi
