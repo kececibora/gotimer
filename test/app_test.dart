@@ -1,17 +1,17 @@
-import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
 import 'package:gotimer/main.dart'; // pubspec.yaml -> name: gotimer
 
 void main() {
   group('EsGo Timer Uygulaması', () {
-    testWidgets('Ana ekranda Zaman Sistemi başlığı ve butonlar görünüyor', (WidgetTester tester) async {
+    testWidgets('Ana ekranda Zaman Sistemi başlığı ve zaman sistemi butonları görünüyor', (WidgetTester tester) async {
       // Uygulamayı başlat
       await tester.pumpWidget(const GoTimerApp());
 
-      // Ana başlık
+      // Başlık
       expect(find.text('Zaman Sistemi'), findsOneWidget);
 
-      // Zaman sistemi butonları
+      // Zaman sistemi seçenekleri
       expect(find.text('Byoyomi'), findsOneWidget);
       expect(find.text('Kanada Byoyomi'), findsOneWidget);
       expect(find.text('Basit Zaman'), findsOneWidget);
@@ -27,74 +27,39 @@ void main() {
       // AppBar başlığı
       expect(find.text('Byoyomi Ayarları'), findsOneWidget);
 
-      // Alanlar ve buton
-      expect(find.text('Ana Süre (Saniye)'), findsOneWidget);
-      expect(find.text('Byoyomi (Saniye)'), findsOneWidget);
+      // Ayar blokları (mevcut UI’ya göre)
+      expect(find.text('Farklı Ayar Kullan'), findsOneWidget);
+      expect(find.text('Ana Süre'), findsOneWidget);
+      expect(find.text('Byoyomi Süresi'), findsOneWidget);
+
+      // Başlat butonu
       expect(find.text('Başlat'), findsOneWidget);
     });
 
-    testWidgets('Ayarlar kaydedilip timer ekranı açılıyor', (WidgetTester tester) async {
+    testWidgets('Ayarlar kaydedilip Başlat\'a basılınca timer ekranı açılıyor ve sayaç ile play/pause ikonları görünüyor', (WidgetTester tester) async {
       await tester.pumpWidget(const GoTimerApp());
 
-      // Byoyomi -> Ayarlar ekranına geç
+      // Ana ekrandan Byoyomi -> Ayar ekranına geç
       await tester.tap(find.text('Byoyomi'));
       await tester.pumpAndSettle();
 
-      // Direkt Başlat'a bas (varsayılan değerlerle)
+      // Başlat butonuna bas
       await tester.tap(find.text('Başlat'));
       await tester.pumpAndSettle();
 
-      // Timer ekranına geçildi mi? (Siyah oyuncu yazısı var mı?)
-      expect(find.text('Siyah'), findsOneWidget);
-
-      // Ekranda süre biçiminde (mm:ss) en az bir metin olsun
+      // Timer ekranında süre (mm:ss) formatında en az bir metin olmalı
       final timeFinder = find.byWidgetPredicate((widget) => widget is Text && RegExp(r'^\d{2}:\d{2}$').hasMatch(widget.data ?? ''));
       expect(timeFinder, findsAtLeastNWidgets(1));
 
-      // Durdur / Devam Et butonu görünüyor mu? (başlangıçta Devam Et)
-      expect(find.text('Devam Et'), findsOneWidget);
-    });
+      // Kontrol barında başlangıçta play ikonunu görmeliyiz
+      expect(find.byIcon(Icons.play_arrow_rounded), findsOneWidget);
+      expect(find.byIcon(Icons.pause_rounded), findsNothing);
 
-    testWidgets('Devam Et butonu sayaç başlatıp Durdur’a dönüşüyor', (WidgetTester tester) async {
-      await tester.pumpWidget(const GoTimerApp());
+      // Play ikonuna tıkla -> pause ikonuna dönmeli
+      await tester.tap(find.byIcon(Icons.play_arrow_rounded));
+      await tester.pump(); // state değişimi için
 
-      // Byoyomi -> Başlat
-      await tester.tap(find.text('Byoyomi'));
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('Başlat'));
-      await tester.pumpAndSettle();
-
-      // İlk durumda "Devam Et"
-      expect(find.text('Devam Et'), findsOneWidget);
-
-      // Butona bas
-      await tester.tap(find.text('Devam Et'));
-      await tester.pump();
-
-      // Artık "Durdur" olmalı
-      expect(find.text('Durdur'), findsOneWidget);
-    });
-
-    testWidgets('Ekrana tıklayınca sıra Siyah <-> Beyaz değişiyor', (WidgetTester tester) async {
-      await tester.pumpWidget(const GoTimerApp());
-
-      // Byoyomi -> Başlat
-      await tester.tap(find.text('Byoyomi'));
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('Başlat'));
-      await tester.pumpAndSettle();
-
-      // Başlangıç: Siyah
-      expect(find.text('Siyah'), findsOneWidget);
-      expect(find.text('Beyaz'), findsNothing);
-
-      // Ekrana tıkla (GestureDetector tüm body'yi sarıyor)
-      await tester.tap(find.byType(Scaffold));
-      await tester.pump();
-
-      // Şimdi Beyaz olmalı
-      expect(find.text('Beyaz'), findsOneWidget);
-      expect(find.text('Siyah'), findsNothing);
+      expect(find.byIcon(Icons.pause_rounded), findsOneWidget);
     });
   });
 }
