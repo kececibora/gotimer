@@ -1,16 +1,86 @@
-# gotimer
+<div align="center">
+  <img src="assets/esgo_logo.png" width="120" alt="EsGo Timer Logo"/>
 
-A new Flutter project.
+# 🕒 **EsGo Timer**
+### A Modern Tournament Clock for Go / Baduk / Weiqi Players
+</div>
 
-## Getting Started
+---
 
-This project is a starting point for a Flutter application.
+## 🌍 Supported Languages  
+EsGo Timer is fully translated into:
 
-A few resources to get you started if this is your first Flutter project:
+- 🇹🇷 **Türkçe**  
+- 🇬🇧 **English**  
+- 🇯🇵 **日本語 (Japanese)**  
+- 🇰🇷 **한국어 (Korean)**  
+- 🇨🇳 **简体中文 (Simplified Chinese)**  
+- 🇹🇼 **繁體中文 (Traditional Chinese)**  
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+---
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## ⚡ Features
+
+### ⏱ Time Systems
+- **Byoyomi (Japanese overtime)**  
+- **Canadian Byoyomi**  
+- **Simple Time (no overtime)**  
+
+### 🎯 Player Options
+- Separate settings for **Black** and **White**
+- Adjustable **hours / minutes / seconds**
+- Adjustable **Byoyomi interval** and **Byoyomi count**
+- Swipe picker interface (Cupertino style)
+
+### 🎮 In-Game Interface
+- Split-screen UI for competitive play  
+- Large, clear digital clock  
+- Move counter  
+- Optional **10-second warning sound**  
+- Tap to switch turns  
+- Start / pause controls  
+- Clean dark UI theme  
+
+### 📱 Platform Support
+- iOS  
+- Android  
+- Web (Flutter Web optimized)  
+
+---
+
+## 🎨 Logo & Asset License
+
+> ⚠️ **IMPORTANT — The logo used in this repository is NOT open-source.**  
+> It is **exclusive** to the EsGo Timer application and copyrighted by the developer.
+
+- Logo **cannot** be reused in any other application  
+- Logo **cannot** be copied, modified, redistributed, or sold  
+- Logo usage rights belong **solely** to:
+
+### **© 2025 Ramazan Bora Keçeci — All Rights Reserved**  
+Unauthorized use is strictly prohibited.
+
+---
+
+## 👥 Credits
+
+### 🧑‍💻 Software Development  
+**Ramazan Bora Keçeci**  
+🔗 https://www.linkedin.com/in/borakececi/
+
+### 🎨 UI/UX Design  
+**M. Kürşat Elitok**  
+🔗 https://www.linkedin.com/in/m-kursat-elitok/
+
+### ♟ Community Support  
+**Eskişehir Go Oyuncuları Derneği**  
+🔗 https://www.instagram.com/eskisehirgooyunculari/
+
+---
+
+## 📦 Installation
+
+### Clone
+```bash
+git clone https://github.com/your-repo/esgo-timer.git
+cd esgo-timer
