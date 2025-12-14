@@ -2,27 +2,28 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gotimer/main.dart';
 
-/// Test ekranını büyütür (RenderFlex overflow fix)
-Future<void> _setTestScreenSize(WidgetTester tester, {Size size = const Size(1080, 1920), double textScale = 1.0}) async {
-  final binding = TestWidgetsFlutterBinding.ensureInitialized();
+/// Test ekranını büyütür (RenderFlex overflow fix) + textScale kontrolü
+void _setTestScreenSize(WidgetTester tester, {Size size = const Size(1080, 1920), double devicePixelRatio = 1.0, double textScale = 1.0}) {
+  final view = tester.view;
 
-  binding.window.physicalSizeTestValue = size;
-  binding.window.devicePixelRatioTestValue = 1.0;
+  // Ekran boyutu / DPR (yeni API)
+  view.physicalSize = size;
+  view.devicePixelRatio = devicePixelRatio;
 
-  // Text scale (bazı cihazlarda büyüyüp overflow yapmasın)
-  tester.binding.platformDispatcher.textScaleFactorTestValue = textScale;
+  // Text scale (yeni API)
+  tester.platformDispatcher.textScaleFactorTestValue = textScale;
 
   addTearDown(() {
-    binding.window.clearPhysicalSizeTestValue();
-    binding.window.clearDevicePixelRatioTestValue();
-    tester.binding.platformDispatcher.clearTextScaleFactorTestValue();
+    view.resetPhysicalSize();
+    view.resetDevicePixelRatio();
+    tester.platformDispatcher.clearTextScaleFactorTestValue();
   });
 }
 
 void main() {
   group('Go Match Timer Uygulaması', () {
     testWidgets('Ana ekranda Zaman Sistemi başlığı ve zaman sistemi kartları görünüyor', (WidgetTester tester) async {
-      await _setTestScreenSize(tester);
+      _setTestScreenSize(tester);
 
       await tester.pumpWidget(const GoTimerApp());
       await tester.pumpAndSettle();
@@ -37,7 +38,7 @@ void main() {
     });
 
     testWidgets('Japon Byoyomi seçilince ayar ekranı açılıyor', (WidgetTester tester) async {
-      await _setTestScreenSize(tester);
+      _setTestScreenSize(tester);
 
       await tester.pumpWidget(const GoTimerApp());
       await tester.pumpAndSettle();
@@ -46,8 +47,8 @@ void main() {
       await tester.tap(find.text('Japon Byoyomi'));
       await tester.pumpAndSettle();
 
-      // AppBar başlığı senin kodunda: "${widget.timeSystem} Ayarları"
-      // timeSystem value: 'Byoyomi' olduğundan başlık "Byoyomi Ayarları" olur.
+      // AppBar başlığı: "${widget.timeSystem} Ayarları"
+      // timeSystem value: 'Byoyomi' => "Byoyomi Ayarları"
       expect(find.text('Byoyomi Ayarları'), findsOneWidget);
 
       // Ayar ekranında beklenen alanlar
@@ -60,7 +61,7 @@ void main() {
     });
 
     testWidgets('Başlat\'a basılınca oyun ekranı açılıyor ve timer + kontrol ikonları görünüyor', (WidgetTester tester) async {
-      await _setTestScreenSize(tester);
+      _setTestScreenSize(tester);
 
       await tester.pumpWidget(const GoTimerApp());
       await tester.pumpAndSettle();
@@ -77,8 +78,9 @@ void main() {
       final timeFinder = find.byWidgetPredicate((widget) => widget is Text && widget.data != null && RegExp(r'^\d{2}:\d{2}$').hasMatch(widget.data!));
       expect(timeFinder, findsAtLeastNWidgets(1));
 
-      // Kontrol ikonları: Timer ekranında 3 buton var: volume, settings, play/pause
-      expect(find.byIcon(Icons.volume_up_rounded).evaluate().isNotEmpty || find.byIcon(Icons.volume_off_rounded).evaluate().isNotEmpty, true);
+      // Kontrol ikonları: volume, settings, play/pause
+      final hasVolumeIcon = find.byIcon(Icons.volume_up_rounded).evaluate().isNotEmpty || find.byIcon(Icons.volume_off_rounded).evaluate().isNotEmpty;
+      expect(hasVolumeIcon, true);
 
       expect(find.byIcon(Icons.settings_rounded), findsOneWidget);
 
