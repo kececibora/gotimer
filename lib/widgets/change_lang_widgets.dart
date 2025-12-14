@@ -1,0 +1,79 @@
+// ================== DİL YÖNETİMİ ==================
+
+import 'package:flutter/material.dart';
+import 'package:gotimer/translate/translate.dart';
+import 'package:gotimer/ui/app_colors.dart';
+import 'package:gotimer/ui/app_dimens.dart';
+
+class AppLanguage {
+  static final ValueNotifier<String> notifier = ValueNotifier<String>('tr');
+
+  static String get current => notifier.value;
+
+  static void set(String code) {
+    if (AppStrings.supportedLanguages.contains(code)) {
+      notifier.value = code;
+    }
+  }
+}
+
+class LanguageButton extends StatelessWidget {
+  const LanguageButton({super.key});
+
+  String _label(String code) {
+    switch (code) {
+      case 'tr':
+        return 'TR';
+      case 'en':
+        return 'EN';
+      case 'ja':
+        return '日本語';
+      case 'ko':
+        return '한국어';
+      case 'zh':
+        return '中文';
+      default:
+        return code.toUpperCase();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder<String>(
+      valueListenable: AppLanguage.notifier,
+      builder: (context, lang, _) {
+        return Container(
+          decoration: BoxDecoration(color: AppColors.card, borderRadius: BorderRadius.circular(AppDimens.gap20)),
+          child: PopupMenuButton<String>(
+            initialValue: lang,
+            offset: const Offset(0, 40),
+            color: AppColors.card,
+            onSelected: (code) => AppLanguage.set(code),
+            itemBuilder: (context) {
+              return AppStrings.supportedLanguages.map((code) {
+                return PopupMenuItem<String>(
+                  value: code,
+                  child: Text(_label(code), style: const TextStyle(color: Colors.white)),
+                );
+              }).toList();
+            },
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    _label(lang),
+                    style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600),
+                  ),
+                  const SizedBox(width: AppDimens.gap4),
+                  const Icon(Icons.language_rounded, size: 32, color: Colors.white),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}

@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:gotimer/main.dart'; // pubspec.yaml -> name: gotimer
 
 void main() {
-  group('EsGo Timer Uygulaması', () {
+  group('Go Match Timer Uygulaması', () {
     testWidgets('Ana ekranda Zaman Sistemi başlığı ve zaman sistemi butonları görünüyor', (WidgetTester tester) async {
       // Uygulamayı başlat
       await tester.pumpWidget(const GoTimerApp());
