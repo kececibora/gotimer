@@ -23,15 +23,25 @@ class LanguageButton extends StatelessWidget {
   String _label(String code) {
     switch (code) {
       case 'tr':
-        return 'TR';
+        return 'TR 🇹🇷';
       case 'en':
-        return 'EN';
+        return 'EN 🇬🇧';
       case 'ja':
-        return '日本語';
+        return '日本語 🇯🇵';
       case 'ko':
-        return '한국어';
+        return '한국어 🇰🇷';
       case 'zh':
-        return '中文';
+        return '中文 🇨🇳';
+
+      case 'de':
+        return 'DE 🇩🇪';
+      case 'fr':
+        return 'FR 🇫🇷';
+      case 'es':
+        return 'ES 🇪🇸';
+      case 'it':
+        return 'IT 🇮🇹';
+
       default:
         return code.toUpperCase();
     }

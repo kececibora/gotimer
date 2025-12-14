@@ -7,6 +7,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gotimer/translate/translate.dart';
+import 'package:gotimer/view/help_page.dart';
 import 'package:gotimer/view/info_page.dart';
 import 'package:gotimer/widgets/background_widget.dart';
 import 'package:gotimer/widgets/change_lang_widgets.dart';
@@ -79,9 +80,12 @@ class TimeSystemScreen extends StatelessWidget {
                   _timeSystemButton(context, 'Basit Zaman', AppStrings.t(lang, 'simpleTitle'), AppStrings.t(lang, 'simpleDesc')),
 
                   const Spacer(),
-                  Align(
-                    alignment: Alignment.bottomRight,
-                    child: InfoButton(languageCode: lang),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      InfoButton(languageCode: lang), // 👈 SAĞ ALT (Info)
+                      const HelpButton(), // 👈 SOL ALT (Nasıl Kullanılır)
+                    ],
                   ),
                   const SizedBox(height: AppDimens.gap8),
                 ],
@@ -298,10 +302,31 @@ class _TimerScreenState extends State<TimerScreen> {
       if (_isBlackTurn) {
         _blackMoves++;
         _blackTenSecWarned = false;
+
+        if (widget.timeSystem == 'Kanada Byoyomi') {
+          _blackByoyomiCount--;
+
+          // 🔁 Kanada: hamleler bitince YENİ PERİYOT
+          if (_blackByoyomiCount == 0) {
+            _blackByoyomiCount = widget.blackByoyomiCount;
+            _blackByoyomiRemaining = widget.blackByoyomi;
+          }
+        }
       } else {
         _whiteMoves++;
         _whiteTenSecWarned = false;
+
+        if (widget.timeSystem == 'Kanada Byoyomi') {
+          _whiteByoyomiCount--;
+
+          // 🔁 Kanada: hamleler bitince YENİ PERİYOT
+          if (_whiteByoyomiCount == 0) {
+            _whiteByoyomiCount = widget.whiteByoyomiCount;
+            _whiteByoyomiRemaining = widget.whiteByoyomi;
+          }
+        }
       }
+
       _isBlackTurn = !_isBlackTurn;
     });
 
@@ -309,6 +334,263 @@ class _TimerScreenState extends State<TimerScreen> {
   }
 
   void _toggleSound() => setState(() => _soundOn = !_soundOn);
+
+  void _openLiveSettings() async {
+    if (_gameEnded) return;
+
+    final wasRunning = _isRunning;
+    if (wasRunning) _pauseTimer();
+
+    await showModalBottomSheet(
+      context: context,
+      useRootNavigator: true,
+      isScrollControlled: true,
+      isDismissible: true,
+      enableDrag: true,
+      backgroundColor: AppColors.card,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(AppDimens.radius24))),
+      builder: (sheetContext) {
+        Widget timeTile(String title, int seconds, VoidCallback onTap) {
+          return Container(
+            margin: const EdgeInsets.symmetric(vertical: 6),
+            decoration: BoxDecoration(color: AppColors.controlBar.withOpacity(0.35), borderRadius: BorderRadius.circular(AppDimens.radius20)),
+            child: ListTile(
+              onTap: onTap,
+              title: Text(
+                title,
+                style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: Colors.white),
+              ),
+              subtitle: Text(_formatHmsFromSeconds(seconds), style: const TextStyle(fontSize: 13, color: AppColors.textSecondary)),
+              trailing: const Icon(Icons.edit_outlined, color: Colors.white70),
+            ),
+          );
+        }
+
+        Widget intTile(String title, int value, int min, int max, void Function(int v) onChanged) {
+          return Container(
+            margin: const EdgeInsets.symmetric(vertical: 6),
+            decoration: BoxDecoration(color: AppColors.controlBar.withOpacity(0.35), borderRadius: BorderRadius.circular(AppDimens.radius20)),
+            child: ListTile(
+              onTap: () async {
+                final picked = await _showIntPickerLive(context: sheetContext, initial: value, min: min, max: max);
+                if (picked != null) onChanged(picked);
+              },
+              title: Text(
+                title,
+                style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: Colors.white),
+              ),
+              subtitle: Text('$value', style: const TextStyle(fontSize: 13, color: AppColors.textSecondary)),
+              trailing: const Icon(Icons.edit_outlined, color: Colors.white70),
+            ),
+          );
+        }
+
+        return SafeArea(
+          child: Padding(
+            padding: EdgeInsets.only(left: 20, right: 20, top: 12, bottom: 24 + MediaQuery.of(sheetContext).viewInsets.bottom),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // üst bar + kapat
+                Row(
+                  children: [
+                    Expanded(
+                      child: Center(
+                        child: Container(
+                          width: 40,
+                          height: 4,
+                          decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(999)),
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close_rounded, color: Colors.white70),
+                      onPressed: () => Navigator.of(sheetContext, rootNavigator: true).pop(),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: AppDimens.gap8),
+                const Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'Canlı Ayar',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: Colors.white),
+                  ),
+                ),
+                const SizedBox(height: AppDimens.gap12),
+
+                // SİYAH
+                const Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'Siyah',
+                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: Colors.white),
+                  ),
+                ),
+                const SizedBox(height: 6),
+                timeTile('Ana Süre (kalan)', _blackMainTime, () async {
+                  final hms = await _showTimePickerLive(context: sheetContext, initialSeconds: _blackMainTime);
+                  if (hms != null) setState(() => _blackMainTime = hms);
+                }),
+                if (!_isSimple) ...[
+                  timeTile('Byoyomi Süresi (kalan)', _blackByoyomiRemaining, () async {
+                    final hms = await _showTimePickerLive(context: sheetContext, initialSeconds: _blackByoyomiRemaining);
+                    if (hms != null) setState(() => _blackByoyomiRemaining = hms);
+                  }),
+                  intTile('Byoyomi / Hamle Sayısı (kalan)', _blackByoyomiCount, 0, 99, (v) => setState(() => _blackByoyomiCount = v)),
+                ],
+
+                const SizedBox(height: AppDimens.gap12),
+
+                // BEYAZ
+                const Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'Beyaz',
+                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: Colors.white),
+                  ),
+                ),
+                const SizedBox(height: 6),
+                timeTile('Ana Süre (kalan)', _whiteMainTime, () async {
+                  final hms = await _showTimePickerLive(context: sheetContext, initialSeconds: _whiteMainTime);
+                  if (hms != null) setState(() => _whiteMainTime = hms);
+                }),
+                if (!_isSimple) ...[
+                  timeTile('Byoyomi Süresi (kalan)', _whiteByoyomiRemaining, () async {
+                    final hms = await _showTimePickerLive(context: sheetContext, initialSeconds: _whiteByoyomiRemaining);
+                    if (hms != null) setState(() => _whiteByoyomiRemaining = hms);
+                  }),
+                  intTile('Byoyomi / Hamle Sayısı (kalan)', _whiteByoyomiCount, 0, 99, (v) => setState(() => _whiteByoyomiCount = v)),
+                ],
+
+                const SizedBox(height: AppDimens.gap12),
+
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton(
+                    style: FilledButton.styleFrom(
+                      backgroundColor: Colors.green,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                    ),
+                    onPressed: () => Navigator.of(sheetContext, rootNavigator: true).pop(),
+                    child: const Text('Tamam', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+
+    if (mounted && wasRunning && !_gameEnded) _startTimer();
+  }
+
+  String _formatHmsFromSeconds(int seconds) {
+    if (seconds < 0) seconds = 0;
+    final h = seconds ~/ 3600;
+    final m = (seconds % 3600) ~/ 60;
+    final s = seconds % 60;
+    return '${h.toString().padLeft(2, '0')}:${m.toString().padLeft(2, '0')}:${s.toString().padLeft(2, '0')}';
+  }
+
+  Future<int?> _showTimePickerLive({required BuildContext context, required int initialSeconds}) async {
+    int h = (initialSeconds ~/ 3600).clamp(0, 9);
+    int m = ((initialSeconds % 3600) ~/ 60).clamp(0, 59);
+    int s = (initialSeconds % 60).clamp(0, 59);
+
+    return showModalBottomSheet<int>(
+      context: context,
+      useRootNavigator: true,
+      builder: (ctx) {
+        return SizedBox(
+          height: 260,
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('İptal')),
+                  const Text('Süre Seç', style: TextStyle(fontWeight: FontWeight.w700)),
+                  TextButton(onPressed: () => Navigator.pop(ctx, h * 3600 + m * 60 + s), child: const Text('Tamam')),
+                ],
+              ),
+              const Divider(height: 1),
+              Expanded(
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: CupertinoPicker(
+                        itemExtent: 32,
+                        scrollController: FixedExtentScrollController(initialItem: h),
+                        onSelectedItemChanged: (v) => h = v,
+                        children: List.generate(10, (i) => Center(child: Text('$i sa'))),
+                      ),
+                    ),
+                    Expanded(
+                      child: CupertinoPicker(
+                        itemExtent: 32,
+                        scrollController: FixedExtentScrollController(initialItem: m),
+                        onSelectedItemChanged: (v) => m = v,
+                        children: List.generate(60, (i) => Center(child: Text('$i dk'))),
+                      ),
+                    ),
+                    Expanded(
+                      child: CupertinoPicker(
+                        itemExtent: 32,
+                        scrollController: FixedExtentScrollController(initialItem: s),
+                        onSelectedItemChanged: (v) => s = v,
+                        children: List.generate(60, (i) => Center(child: Text('$i sn'))),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<int?> _showIntPickerLive({required BuildContext context, required int initial, required int min, required int max}) async {
+    int selected = initial.clamp(min, max);
+    final itemCount = max - min + 1;
+    final initialIndex = (selected - min).clamp(0, itemCount - 1);
+
+    return showModalBottomSheet<int>(
+      context: context,
+      useRootNavigator: true,
+      builder: (ctx) {
+        return SizedBox(
+          height: 240,
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('İptal')),
+                  const Text('Seç', style: TextStyle(fontWeight: FontWeight.w700)),
+                  TextButton(onPressed: () => Navigator.pop(ctx, selected), child: const Text('Tamam')),
+                ],
+              ),
+              const Divider(height: 1),
+              Expanded(
+                child: CupertinoPicker(
+                  itemExtent: 32,
+                  scrollController: FixedExtentScrollController(initialItem: initialIndex),
+                  onSelectedItemChanged: (index) => selected = min + index,
+                  children: List.generate(itemCount, (index) => Center(child: Text('${min + index}'))),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -404,7 +686,11 @@ class _TimerScreenState extends State<TimerScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [button(_soundOn ? Icons.volume_up_rounded : Icons.volume_off_rounded, _toggleSound), button(_isRunning ? Icons.pause_rounded : Icons.play_arrow_rounded, _toggleRunPause)],
+        children: [
+          button(_soundOn ? Icons.volume_up_rounded : Icons.volume_off_rounded, _toggleSound),
+          button(Icons.settings_rounded, _openLiveSettings), // ✅ ORTA AYAR
+          button(_isRunning ? Icons.pause_rounded : Icons.play_arrow_rounded, _toggleRunPause),
+        ],
       ),
     );
   }
@@ -420,11 +706,11 @@ class _TimerScreenState extends State<TimerScreen> {
 
     if (!_isSimple && byoyomiCount > 0) {
       if (widget.timeSystem == 'Byoyomi') {
-        // 🇯🇵 Japon Byoyomi
-        byoyomiInfo = 'Byo: $byoyomiCount hak | ${byoyomiRemaining} sn';
+        final fixedSec = isBlack ? widget.blackByoyomi : widget.whiteByoyomi;
+        byoyomiInfo = 'Byo: $byoyomiCount Hak | $fixedSec sn';
       } else if (widget.timeSystem == 'Kanada Byoyomi') {
-        // 🇨🇦 Kanada Byoyomi
-        byoyomiInfo = 'Kalan hamle: $byoyomiCount | ${byoyomiRemaining} sn';
+        final fixedSec = isBlack ? widget.blackByoyomi : widget.whiteByoyomi;
+        byoyomiInfo = 'Kalan Hamle: $byoyomiCount | $fixedSec sn';
       }
     }
 

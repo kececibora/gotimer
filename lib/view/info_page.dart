@@ -32,37 +32,58 @@ class InfoButton extends StatelessWidget {
   void _showInfo(BuildContext context) {
     showModalBottomSheet(
       context: context,
+      useRootNavigator: true, // ✅ en kritik satır
       backgroundColor: AppColors.card,
+      isDismissible: true,
+      enableDrag: true,
+      isScrollControlled: true,
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(AppDimens.radius24))),
-      builder: (ctx) {
-        return Padding(
-          padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(999)),
+      builder: (sheetContext) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Center(
+                        child: Container(
+                          width: 40,
+                          height: 4,
+                          decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(999)),
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        Navigator.of(context, rootNavigator: true).pop(); // ✅ sağlam kapatma
+                      },
+                      icon: const Icon(Icons.close_rounded, color: Colors.white70),
+                    ),
+                  ],
                 ),
-              ),
-              const SizedBox(height: AppDimens.gap16),
-              Text(
-                AppStrings.t(languageCode, 'infoTitle'),
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Colors.white),
-              ),
-              const SizedBox(height: AppDimens.gap16),
-              _buildLinkRow(label: AppStrings.t(languageCode, 'infoSoftware'), name: 'rbkececi', url: 'https://www.linkedin.com/in/borakececi/'),
-              const SizedBox(height: AppDimens.gap10),
-              _buildLinkRow(label: AppStrings.t(languageCode, 'infoDesign'), name: 'mkrst', url: 'https://www.linkedin.com/in/m-kursat-elitok/'),
-              const SizedBox(height: AppDimens.gap16),
-              const Text(' ', style: TextStyle(fontSize: 0)),
-              Text(AppStrings.t(languageCode, 'infoThanks'), style: const TextStyle(fontSize: 13, color: AppColors.textSecondary)),
-              const SizedBox(height: AppDimens.gap8),
-              _buildLinkRow(label: '', name: 'Eskişehir Go Oyuncuları Derneği', url: 'https://www.instagram.com/eskisehirgooyunculari/'),
-            ],
+
+                const SizedBox(height: AppDimens.gap8),
+
+                Text(
+                  AppStrings.t(languageCode, 'infoTitle'),
+                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Colors.white),
+                ),
+                const SizedBox(height: AppDimens.gap16),
+
+                _buildLinkRow(label: AppStrings.t(languageCode, 'infoSoftware'), name: 'rbkececi', url: 'https://www.linkedin.com/in/borakececi/'),
+                const SizedBox(height: AppDimens.gap10),
+                _buildLinkRow(label: AppStrings.t(languageCode, 'infoDesign'), name: 'mkrst', url: 'https://www.linkedin.com/in/m-kursat-elitok/'),
+
+                const SizedBox(height: AppDimens.gap16),
+                Text(AppStrings.t(languageCode, 'infoThanks'), style: const TextStyle(fontSize: 13, color: AppColors.textSecondary)),
+                const SizedBox(height: AppDimens.gap8),
+                _buildLinkRow(label: '', name: 'Eskişehir Go Oyuncuları Derneği', url: 'https://www.instagram.com/eskisehirgooyunculari/'),
+              ],
+            ),
           ),
         );
       },
