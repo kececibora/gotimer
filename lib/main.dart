@@ -176,7 +176,7 @@ class _TimerScreenState extends State<TimerScreen> {
   bool _controlsVisible = true;
   Timer? _controlsAutoHideTimer;
 
-  double get _controlBarHeight => 56; // mevcut bar yüksekliğine yakın
+  // double get _controlBarHeight => 56; // mevcut bar yüksekliğine yakın
 
   late int _whiteMainTime;
   late int _whiteByoyomiRemaining;
@@ -206,12 +206,23 @@ class _TimerScreenState extends State<TimerScreen> {
   Widget _buildControlBarTapArea() {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
-      onTap: _toggleControls,
-      child: AnimatedSwitcher(
+      onTap: () {
+        // Silikse: 1 dokunuşla aktif yap
+        if (!_controlsVisible) {
+          _showControls(autoHide: true);
+          return;
+        }
+
+        // Aktifse: istersen tekrar silikleştir (toggle mantığı kalsın)
+        _hideControls();
+      },
+      child: AnimatedOpacity(
         duration: const Duration(milliseconds: 200),
-        child: _controlsVisible
-            ? _buildControlBar() // ✅ BURASI: gerçek bar
-            : SizedBox(key: const ValueKey('hidden_bar'), height: _controlBarHeight, width: double.infinity),
+        opacity: _controlsVisible ? 1.0 : 0.22, // 👈 siliklik seviyesi
+        child: AbsorbPointer(
+          absorbing: !_controlsVisible, // 👈 silikken butonlar tıklanamaz
+          child: _buildControlBar(),
+        ),
       ),
     );
   }
@@ -231,7 +242,7 @@ class _TimerScreenState extends State<TimerScreen> {
     }
 
     return Container(
-      key: const ValueKey('visible_bar'),
+      key: ValueKey(_controlsVisible ? 'visible_bar' : 'hidden_bar'),
       color: AppColors.controlBar,
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
       child: Row(
@@ -272,13 +283,13 @@ class _TimerScreenState extends State<TimerScreen> {
     }
   }
 
-  void _toggleControls() {
-    if (_controlsVisible) {
-      _hideControls();
-    } else {
-      _showControls(autoHide: true);
-    }
-  }
+  // void _toggleControls() {
+  //   if (_controlsVisible) {
+  //     _hideControls();
+  //   } else {
+  //     _showControls(autoHide: true);
+  //   }
+  // }
 
   Future<void> _playBeep() async => SystemSound.play(SystemSoundType.alert);
 
