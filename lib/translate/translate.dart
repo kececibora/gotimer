@@ -105,7 +105,7 @@ class AppStrings {
       'canadaTitle': 'Canadian Byoyomi',
       'canadaDesc': 'Main Time + Time / Move Count',
 
-      'simpleTitle': 'Simple Time',
+      'simpleTitle': 'Simple Time (Sudden Death)',
       'simpleDesc': 'Main Time (no extra period)',
 
       'settingsDifferent': 'Use Different Settings',

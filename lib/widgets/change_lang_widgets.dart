@@ -6,7 +6,7 @@ import 'package:gotimer/ui/app_colors.dart';
 import 'package:gotimer/ui/app_dimens.dart';
 
 class AppLanguage {
-  static final ValueNotifier<String> notifier = ValueNotifier<String>('tr');
+  static final ValueNotifier<String> notifier = ValueNotifier<String>('en');
 
   static String get current => notifier.value;
 
