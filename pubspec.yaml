@@ -17,6 +17,7 @@ dependencies:
 
   # Çoklu dil desteği
   easy_localization: ^3.0.5
+  flutter_launcher_icons: ^0.14.4
 
 dev_dependencies:
   flutter_test:
@@ -25,7 +26,6 @@ dev_dependencies:
   flutter_lints: ^6.0.0
 
   # Uygulama ikonlarını otomatik oluşturma
-  flutter_launcher_icons: ^0.13.1
 
 # ---- App Icon Ayarları ----
 flutter_launcher_icons:
