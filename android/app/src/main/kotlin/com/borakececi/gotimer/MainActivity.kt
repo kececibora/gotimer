@@ -1,4 +1,4 @@
-package com.example.gotimer
+package com.borakececi.gotimer
 
 import io.flutter.embedding.android.FlutterActivity
 
