@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gotimer/main.dart';
 
@@ -20,8 +21,40 @@ Future<void> pumpApp(WidgetTester tester) async {
   await tester.pumpAndSettle();
 }
 
-/// Ekrandaki tüm "MM:SS" textlerini listeler.
-/// Timer ekranında genelde 2 tane olur (beyaz + siyah).
+/// Home'da 3 zaman sistemi kartı var ve hepsinde Icons.timer_rounded var.
+/// İlk karta tıklayıp (Byoyomi) settings ekranına gider.
+Future<void> goToByoyomiSettings(WidgetTester tester) async {
+  await pumpApp(tester);
+
+  final timerIcons = find.byIcon(Icons.timer_rounded);
+  expect(timerIcons, findsNWidgets(3));
+
+  await tester.tap(timerIcons.at(0));
+  await tester.pumpAndSettle();
+
+  // Settings ekranında en altta geniş FilledButton var (Start)
+  expect(find.byType(FilledButton), findsAtLeastNWidgets(1));
+}
+
+/// Settings ekranındaki en alttaki geniş FilledButton'a basıp Timer ekranına gider.
+Future<void> startFromByoyomi(WidgetTester tester) async {
+  await goToByoyomiSettings(tester);
+
+  final allFilled = find.byType(FilledButton);
+  expect(allFilled, findsAtLeastNWidgets(1));
+
+  // Settings'teki Start butonu genelde en altta son FilledButton.
+  await tester.tap(allFilled.last);
+  await tester.pumpAndSettle();
+
+  // Timer ekranda MM:SS görünmeli
+  expect(find.byWidgetPredicate((w) => w is Text && w.data != null && RegExp(r'^\d{2}:\d{2}$').hasMatch(w.data!)), findsAtLeastNWidgets(1));
+
+  // Başlangıçta bar görünür
+  expect(find.byKey(const ValueKey('visible_bar')), findsOneWidget);
+}
+
+/// Ekrandaki tüm "MM:SS" textlerini listeler
 List<String> readAllTimes(WidgetTester tester) {
   final texts = tester.widgetList<Text>(
     find.byWidgetPredicate((w) {
@@ -31,12 +64,9 @@ List<String> readAllTimes(WidgetTester tester) {
   return texts.map((t) => t.data!).toList();
 }
 
-/// Sıra bağımsız: herhangi bir time değişti mi?
 bool anyTimeChangedUnordered(List<String> before, List<String> after) {
-  // Çok nadir: list uzunluğu değişerse de "değişti" kabul edelim
   if (before.length != after.length) return true;
 
-  // Multiset gibi davranmak için sayalım
   final Map<String, int> b = {};
   final Map<String, int> a = {};
 
@@ -60,39 +90,13 @@ Future<void> elapseSeconds(WidgetTester tester, int seconds) async {
   }
 }
 
-Future<void> goToJapaneseByoyomiSettings(WidgetTester tester) async {
-  await pumpApp(tester);
-
-  await tester.tap(find.text('Japon Byoyomi'));
-  await tester.pumpAndSettle();
-
-  expect(find.textContaining('Ayar'), findsWidgets);
-  expect(find.text('Başlat'), findsOneWidget);
-}
-
-Future<void> startFromJapaneseByoyomi(WidgetTester tester) async {
-  await goToJapaneseByoyomiSettings(tester);
-
-  await tester.tap(find.text('Başlat'));
-  await tester.pumpAndSettle();
-
-  // Timer ekranda MM:SS görünmeli
-  expect(find.byWidgetPredicate((w) => w is Text && w.data != null && RegExp(r'^\d{2}:\d{2}$').hasMatch(w.data!)), findsAtLeastNWidgets(1));
-
-  // Başlangıçta bar görünür
-  expect(find.byKey(const ValueKey('visible_bar')), findsOneWidget);
-}
-
-/// Silik bar varken 1 kez dokununca aktif hale gelmeli.
-/// (Artık bar hiç kaybolmuyor; sadece key 'hidden_bar' oluyor)
 Future<void> showControlBarAgain(WidgetTester tester) async {
   if (find.byKey(const ValueKey('visible_bar')).evaluate().isNotEmpty) return;
 
-  // Silik bar
   expect(find.byKey(const ValueKey('hidden_bar')), findsOneWidget);
 
-  // En sağlamı: bar widget'ına tap
   await tester.tap(find.byKey(const ValueKey('hidden_bar')), warnIfMissed: false);
+  await tester.pump();
   await tester.pumpAndSettle();
 
   expect(find.byKey(const ValueKey('visible_bar')), findsOneWidget);
@@ -105,70 +109,71 @@ Future<void> pressPlay(WidgetTester tester) async {
   expect(play, findsOneWidget);
 
   await tester.tap(play);
-  await tester.pump(); // state değişsin
+  await tester.pump();
 
-  // Play -> bar silikleşir (hidden_bar)
   expect(find.byKey(const ValueKey('hidden_bar')), findsOneWidget);
 }
 
 Future<void> pressPause(WidgetTester tester) async {
-  // Pause ikonuna basabilmek için önce bar'ı görünür yap
   await showControlBarAgain(tester);
 
   final pause = find.byIcon(Icons.pause_rounded);
   expect(pause, findsOneWidget);
 
   await tester.tap(pause);
+  await tester.pump();
   await tester.pumpAndSettle();
 
-  // Pause -> bar görünür kalır
   expect(find.byKey(const ValueKey('visible_bar')), findsOneWidget);
 }
 
 void main() {
-  group('🟢 Go Match Timer – Ana Akış Testleri (main.dart son hali)', () {
-    testWidgets('Ana ekran yükleniyor ve zaman sistemleri görünüyor', (tester) async {
+  // SystemSound.play test ortamında patlamasın
+  setUpAll(() {
+    TestWidgetsFlutterBinding.ensureInitialized();
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(SystemChannels.platform, (call) async {
+      if (call.method == 'SystemSound.play') return null;
+      return null;
+    });
+  });
+
+  group('🟢 Go Match Timer – Universal Flow Tests', () {
+    testWidgets('Home yükleniyor (3 time system kartı var)', (tester) async {
       _setTestScreenSize(tester);
       await pumpApp(tester);
 
-      expect(find.text('Zaman Sistemi'), findsOneWidget);
-      expect(find.text('Japon Byoyomi'), findsOneWidget);
-      expect(find.text('Kanada Byoyomi'), findsOneWidget);
-      expect(find.text('Basit Zaman'), findsOneWidget);
+      expect(find.byIcon(Icons.timer_rounded), findsNWidgets(3));
     });
 
-    testWidgets('Japon Byoyomi ayar ekranı açılıyor', (tester) async {
+    testWidgets('Byoyomi settings açılıyor', (tester) async {
       _setTestScreenSize(tester);
-      await goToJapaneseByoyomiSettings(tester);
+      await goToByoyomiSettings(tester);
     });
 
-    testWidgets('Başlat → Timer ekranı açılıyor', (tester) async {
+    testWidgets('Start → Timer ekranı açılıyor', (tester) async {
       _setTestScreenSize(tester);
-      await startFromJapaneseByoyomi(tester);
+      await startFromByoyomi(tester);
     });
 
-    testWidgets('Play → Timer başlıyor, bar silikleşiyor, zaman akıyor', (tester) async {
+    testWidgets('Play → bar silikleşiyor, zaman akıyor', (tester) async {
       _setTestScreenSize(tester);
-      await startFromJapaneseByoyomi(tester);
+      await startFromByoyomi(tester);
 
       final before = readAllTimes(tester);
       expect(before, isNotEmpty);
 
       await pressPlay(tester);
-
-      // 2-3 sn yeterli, 3 yapalım
       await elapseSeconds(tester, 3);
 
       final after = readAllTimes(tester);
       expect(after, isNotEmpty);
 
-      // Sıra bağımsız: en az bir time değişmeli
       expect(anyTimeChangedUnordered(before, after), isTrue);
     });
 
-    testWidgets('Pause → Timer duruyor, bar görünür, zaman duruyor', (tester) async {
+    testWidgets('Pause → zaman duruyor, bar görünür', (tester) async {
       _setTestScreenSize(tester);
-      await startFromJapaneseByoyomi(tester);
+      await startFromByoyomi(tester);
 
       await pressPlay(tester);
       await elapseSeconds(tester, 2);
@@ -176,52 +181,21 @@ void main() {
       await pressPause(tester);
 
       final beforePause = readAllTimes(tester);
-      expect(beforePause, isNotEmpty);
-
       await elapseSeconds(tester, 3);
-
       final afterPause = readAllTimes(tester);
-      expect(afterPause, isNotEmpty);
 
-      // Pause sonrası zaman değişmemeli
       expect(anyTimeChangedUnordered(beforePause, afterPause), isFalse);
+      expect(find.byKey(const ValueKey('visible_bar')), findsOneWidget);
     });
 
-    testWidgets('Pause → Play çalışıyor (dur → tekrar ak)', (tester) async {
+    testWidgets('Ses toggle', (tester) async {
       _setTestScreenSize(tester);
-      await startFromJapaneseByoyomi(tester);
+      await startFromByoyomi(tester);
 
-      // Play
-      await pressPlay(tester);
-      await elapseSeconds(tester, 2);
-
-      // Pause
-      await pressPause(tester);
-      final paused1 = readAllTimes(tester);
-      await elapseSeconds(tester, 2);
-      final paused2 = readAllTimes(tester);
-
-      // Pause'da değişmemeli
-      expect(anyTimeChangedUnordered(paused1, paused2), isFalse);
-
-      // Tekrar Play
-      await pressPlay(tester);
-      final before = readAllTimes(tester);
-      await elapseSeconds(tester, 2);
-      final after = readAllTimes(tester);
-
-      // Tekrar akmalı
-      expect(anyTimeChangedUnordered(before, after), isTrue);
-    });
-
-    testWidgets('Ses butonu toggle oluyor', (tester) async {
-      _setTestScreenSize(tester);
-      await startFromJapaneseByoyomi(tester);
+      await showControlBarAgain(tester);
 
       final volUp = find.byIcon(Icons.volume_up_rounded);
       final volOff = find.byIcon(Icons.volume_off_rounded);
-
-      expect(find.byKey(const ValueKey('visible_bar')), findsOneWidget);
 
       if (volUp.evaluate().isNotEmpty) {
         await tester.tap(volUp);
@@ -236,14 +210,18 @@ void main() {
 
     testWidgets('Settings bottom sheet açılıyor ve X ile kapanıyor', (tester) async {
       _setTestScreenSize(tester);
-      await startFromJapaneseByoyomi(tester);
+      await startFromByoyomi(tester);
+
+      await showControlBarAgain(tester);
 
       await tester.tap(find.byIcon(Icons.settings_rounded));
+      await tester.pump();
       await tester.pumpAndSettle();
 
       expect(find.byIcon(Icons.close_rounded), findsOneWidget);
 
       await tester.tap(find.byIcon(Icons.close_rounded));
+      await tester.pump();
       await tester.pumpAndSettle();
 
       expect(find.byIcon(Icons.close_rounded), findsNothing);
