@@ -17,6 +17,10 @@ import 'ui/app_dimens.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // ✅ Uygulama her zaman dik kalsın
+  await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+
   runApp(const GoTimerApp());
 }
 
