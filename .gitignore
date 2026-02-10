@@ -44,3 +44,10 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Android signing (VERY IMPORTANT)
+*.jks
+*.keystore
+*.pem
+key.properties
+

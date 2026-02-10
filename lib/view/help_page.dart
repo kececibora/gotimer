@@ -14,8 +14,15 @@ class HelpButton extends StatelessWidget {
       onTap: () => _showHelp(context),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        decoration: BoxDecoration(color: AppColors.card, borderRadius: BorderRadius.circular(AppDimens.radius20)),
-        child: const Icon(Icons.help_outline_rounded, size: 32, color: AppColors.textSecondary),
+        decoration: BoxDecoration(
+          color: AppColors.card,
+          borderRadius: BorderRadius.circular(AppDimens.radius20),
+        ),
+        child: Icon(
+          Icons.help_outline_rounded,
+          size: 32,
+          color: AppColors.textSecondary,
+        ),
       ),
     );
   }
@@ -28,7 +35,11 @@ class HelpButton extends StatelessWidget {
       isDismissible: true,
       enableDrag: true,
       backgroundColor: AppColors.card,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(AppDimens.radius24))),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(AppDimens.radius24),
+        ),
+      ),
       builder: (sheetContext) {
         return ValueListenableBuilder<String>(
           valueListenable: AppLanguage.notifier,
@@ -43,8 +54,12 @@ class HelpButton extends StatelessWidget {
                       children: [
                         const Expanded(child: _DragHandle()),
                         IconButton(
-                          icon: const Icon(Icons.close_rounded, color: Colors.white70),
-                          onPressed: () => Navigator.of(context, rootNavigator: true).pop(),
+                          icon: const Icon(
+                            Icons.close_rounded,
+                            color: Colors.white70,
+                          ),
+                          onPressed: () =>
+                              Navigator.of(context, rootNavigator: true).pop(),
                         ),
                       ],
                     ),
@@ -80,7 +95,11 @@ class _HelpTitle extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       AppStrings.t(lang, 'helpTitle'),
-      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: Colors.white),
+      style: const TextStyle(
+        fontSize: 18,
+        fontWeight: FontWeight.w800,
+        color: Colors.white,
+      ),
     );
   }
 }
@@ -95,7 +114,11 @@ class _SectionTitle extends StatelessWidget {
       padding: const EdgeInsets.only(top: 12, bottom: 4),
       child: Text(
         text,
-        style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: Colors.white),
+        style: const TextStyle(
+          fontSize: 15,
+          fontWeight: FontWeight.w700,
+          color: Colors.white,
+        ),
       ),
     );
   }
@@ -110,7 +133,10 @@ class _DragHandle extends StatelessWidget {
       child: Container(
         width: 40,
         height: 4,
-        decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(999)),
+        decoration: BoxDecoration(
+          color: Colors.white24,
+          borderRadius: BorderRadius.circular(999),
+        ),
       ),
     );
   }
@@ -122,7 +148,14 @@ class _Paragraph extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(text, style: const TextStyle(fontSize: 13, color: AppColors.textSecondary, height: 1.4));
+    return Text(
+      text,
+      style: TextStyle(
+        fontSize: 13,
+        color: AppColors.textSecondary,
+        height: 1.4,
+      ),
+    );
   }
 }
 
@@ -187,7 +220,10 @@ class _Bullet extends StatelessWidget {
         children: [
           const Text('• ', style: TextStyle(color: Colors.white)),
           Expanded(
-            child: Text(text, style: const TextStyle(fontSize: 13, color: AppColors.textSecondary)),
+            child: Text(
+              text,
+              style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
+            ),
           ),
         ],
       ),

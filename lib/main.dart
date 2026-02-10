@@ -1,10 +1,9 @@
-
-
 // ignore_for_file: deprecated_member_use
 
 import 'dart:async';
 import 'dart:math';
 
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -16,12 +15,15 @@ import 'package:gotimer/widgets/change_lang_widgets.dart';
 
 import 'ui/app_colors.dart';
 import 'ui/app_dimens.dart';
+import 'ui/app_theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // ✅ Uygulama her zaman dik kalsın
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+  await AppThemeController.loadTheme();
+  await AppLanguage.load();
 
   runApp(const GoTimerApp());
 }
@@ -39,11 +41,16 @@ class GoTimerApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Go Match Timer',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(useMaterial3: true, scaffoldBackgroundColor: AppColors.bg),
-      home: const TimeSystemScreen(),
+    return ValueListenableBuilder<GoThemeId>(
+      valueListenable: AppThemeController.notifier,
+      builder: (context, themeId, child) {
+        return MaterialApp(
+          title: 'Go Match Timer',
+          debugShowCheckedModeBanner: false,
+          theme: AppThemeController.buildMaterialTheme(),
+          home: const TimeSystemScreen(),
+        );
+      },
     );
   }
 }
@@ -54,75 +61,259 @@ class TimeSystemScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<String>(
-      valueListenable: AppLanguage.notifier,
-      builder: (context, lang, _) {
-        return Scaffold(
-          backgroundColor: AppColors.bg,
-          body: AppBackground(
-            imagePath1: 'assets/background/background_2.png',
-            imagePath2: 'assets/background/background_1.png',
-            child: Padding(
-              padding: AppDimens.screenPadding,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Row(mainAxisAlignment: MainAxisAlignment.end, children: const [LanguageButton()]),
+    return ValueListenableBuilder<GoThemeId>(
+      valueListenable: AppThemeController.notifier,
+      builder: (context, selectedTheme, child) {
+        return ValueListenableBuilder<String>(
+          valueListenable: AppLanguage.notifier,
+          builder: (context, lang, _) {
+            return Scaffold(
+              backgroundColor: AppColors.bg,
+              body: AppBackground(
+                child: Padding(
+                  padding: AppDimens.screenPadding,
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      return SingleChildScrollView(
+                        child: ConstrainedBox(
+                          constraints: BoxConstraints(
+                            minHeight: constraints.maxHeight,
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: const [LanguageButton()],
+                              ),
 
-                  // Başlığı biraz daha aşağıya aldık
-                  const SizedBox(height: 100),
+                              const SizedBox(height: 50),
 
-                  Text(
-                    AppStrings.t(lang, 'appSubtitle'),
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w600, color: AppColors.textSecondary),
+                              Text(
+                                AppStrings.t(lang, 'appSubtitle'),
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.textSecondary,
+                                ),
+                              ),
+                              const SizedBox(height: AppDimens.gap12),
+                              Text(
+                                AppStrings.t(lang, 'timeSystemTitle'),
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                  fontSize: 32,
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: 1,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              const SizedBox(height: AppDimens.gap16),
+                              _themeSelector(
+                                lang: lang,
+                                selectedTheme: selectedTheme,
+                              ),
+                              const SizedBox(height: AppDimens.gap20),
+
+                              _timeSystemButton(
+                                context,
+                                TimeSystemIds.byoyomi,
+                                AppStrings.t(lang, 'byoyomiTitle'),
+                                AppStrings.t(lang, 'byoyomiDesc'),
+                              ),
+                              const SizedBox(height: AppDimens.gap16),
+                              _timeSystemButton(
+                                context,
+                                TimeSystemIds.canada,
+                                AppStrings.t(lang, 'canadaTitle'),
+                                AppStrings.t(lang, 'canadaDesc'),
+                              ),
+                              const SizedBox(height: AppDimens.gap16),
+                              _timeSystemButton(
+                                context,
+                                TimeSystemIds.simple,
+                                AppStrings.t(lang, 'simpleTitle'),
+                                AppStrings.t(lang, 'simpleDesc'),
+                              ),
+
+                              const SizedBox(height: AppDimens.gap24),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  InfoButton(
+                                    languageCode: lang,
+                                  ), // 👈 SAĞ ALT (Info)
+                                  const HelpButton(), // 👈 SOL ALT (Nasıl Kullanılır)
+                                ],
+                              ),
+                              const SizedBox(height: AppDimens.gap8),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
                   ),
-                  const SizedBox(height: AppDimens.gap12),
-                  Text(
-                    AppStrings.t(lang, 'timeSystemTitle'),
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(fontSize: 32, fontWeight: FontWeight.w800, letterSpacing: 1, color: Colors.white),
-                  ),
-                  const SizedBox(height: AppDimens.gap32),
-
-                  _timeSystemButton(context, TimeSystemIds.byoyomi, AppStrings.t(lang, 'byoyomiTitle'), AppStrings.t(lang, 'byoyomiDesc')),
-                  const SizedBox(height: AppDimens.gap16),
-                  _timeSystemButton(context, TimeSystemIds.canada, AppStrings.t(lang, 'canadaTitle'), AppStrings.t(lang, 'canadaDesc')),
-                  const SizedBox(height: AppDimens.gap16),
-                  _timeSystemButton(context, TimeSystemIds.simple, AppStrings.t(lang, 'simpleTitle'), AppStrings.t(lang, 'simpleDesc')),
-
-                  const Spacer(),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      InfoButton(languageCode: lang), // 👈 SAĞ ALT (Info)
-                      const HelpButton(), // 👈 SOL ALT (Nasıl Kullanılır)
-                    ],
-                  ),
-                  const SizedBox(height: AppDimens.gap8),
-                ],
+                ),
               ),
-            ),
-          ),
+            );
+          },
         );
       },
     );
   }
 
-  Widget _timeSystemButton(BuildContext context, String systemId, String title, String description) {
+  String _themeTitle(String lang) => lang == 'tr' ? 'Tema Seçimi' : 'Theme';
+
+  String _themeName(String lang, GoThemeId theme) {
+    final isTr = lang == 'tr';
+    switch (theme) {
+      case GoThemeId.classic:
+        return isTr ? 'Orijinal' : 'Original';
+      case GoThemeId.wood:
+        return isTr ? 'Ahsap Uzak Dogu' : 'Wood Dojo';
+      case GoThemeId.cyber:
+        return isTr ? 'Cyberpunk Neon' : 'Cyberpunk Neon';
+    }
+  }
+
+  Widget _themeSelector({
+    required String lang,
+    required GoThemeId selectedTheme,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          _themeTitle(lang),
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w700,
+            color: AppColors.textSecondary,
+            letterSpacing: 0.4,
+          ),
+        ),
+        const SizedBox(height: 10),
+        Row(
+          children: [
+            _themeOptionCard(
+              icon: Icons.layers_rounded,
+              label: _themeName(lang, GoThemeId.classic),
+              selected: selectedTheme == GoThemeId.classic,
+              onTap: () => AppThemeController.setTheme(GoThemeId.classic),
+            ),
+            const SizedBox(width: 8),
+            _themeOptionCard(
+              icon: Icons.temple_buddhist_rounded,
+              label: _themeName(lang, GoThemeId.wood),
+              selected: selectedTheme == GoThemeId.wood,
+              onTap: () => AppThemeController.setTheme(GoThemeId.wood),
+            ),
+            const SizedBox(width: 8),
+            _themeOptionCard(
+              icon: Icons.bolt_rounded,
+              label: _themeName(lang, GoThemeId.cyber),
+              selected: selectedTheme == GoThemeId.cyber,
+              onTap: () => AppThemeController.setTheme(GoThemeId.cyber),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _themeOptionCard({
+    required IconData icon,
+    required String label,
+    required bool selected,
+    required VoidCallback onTap,
+  }) {
+    return Expanded(
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          curve: Curves.easeOutCubic,
+          height: 78,
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          decoration: BoxDecoration(
+            color: selected
+                ? AppColors.controlButton.withOpacity(0.88)
+                : AppColors.card.withOpacity(0.82),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: selected ? AppColors.accent : Colors.white24,
+              width: selected ? 1.4 : 1,
+            ),
+            boxShadow: selected
+                ? [
+                    BoxShadow(
+                      color: AppColors.accent.withOpacity(0.35),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ]
+                : null,
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                icon,
+                color: selected ? AppColors.accent : Colors.white,
+                size: 20,
+              ),
+              const SizedBox(height: 6),
+              Text(
+                label,
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _timeSystemButton(
+    BuildContext context,
+    String systemId,
+    String title,
+    String description,
+  ) {
     return InkWell(
       borderRadius: BorderRadius.circular(AppDimens.radius24),
-      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => TimerSettingsScreen(timeSystem: systemId))),
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => TimerSettingsScreen(timeSystem: systemId),
+        ),
+      ),
       child: Ink(
         decoration: BoxDecoration(
           color: AppColors.card,
           borderRadius: BorderRadius.circular(AppDimens.radius24),
-          boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 18, offset: Offset(0, 8))],
+          boxShadow: const [
+            BoxShadow(
+              color: Colors.black26,
+              blurRadius: 18,
+              offset: Offset(0, 8),
+            ),
+          ],
         ),
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
         child: Row(
           children: [
-            const Icon(Icons.timer_rounded, color: Colors.white, size: 32),
+            Icon(_timeSystemIcon(systemId), color: Colors.white, size: 32),
             const SizedBox(width: AppDimens.gap18),
             Expanded(
               child: Column(
@@ -130,10 +321,20 @@ class TimeSystemScreen extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: Colors.white),
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                    ),
                   ),
                   const SizedBox(height: AppDimens.gap4),
-                  Text(description, style: const TextStyle(fontSize: 13, color: AppColors.textSecondary)),
+                  Text(
+                    description,
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -141,6 +342,18 @@ class TimeSystemScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  IconData _timeSystemIcon(String systemId) {
+    switch (systemId) {
+      case TimeSystemIds.byoyomi:
+        return Icons.hourglass_bottom_rounded;
+      case TimeSystemIds.canada:
+        return Icons.format_list_numbered_rounded;
+      case TimeSystemIds.simple:
+      default:
+        return Icons.timer_rounded;
+    }
   }
 }
 
@@ -171,6 +384,8 @@ class TimerScreen extends StatefulWidget {
 }
 
 class _TimerScreenState extends State<TimerScreen> {
+  AudioPlayer? _beepPlayer;
+  bool _assetBeepReady = false;
   Timer? _timer;
   bool _isRunning = false;
   bool _isBlackTurn = true;
@@ -193,14 +408,12 @@ class _TimerScreenState extends State<TimerScreen> {
   String? _winnerKey;
 
   bool _soundOn = true;
-  bool _blackTenSecWarned = false;
-  bool _whiteTenSecWarned = false;
-
   bool get _isSimple => widget.timeSystem == TimeSystemIds.simple;
 
   @override
   void initState() {
     super.initState();
+    _initBeepPlayer();
     _blackMainTime = widget.blackMainTime;
     _whiteMainTime = widget.whiteMainTime;
     _blackByoyomiRemaining = widget.blackByoyomi;
@@ -241,7 +454,10 @@ class _TimerScreenState extends State<TimerScreen> {
         child: Container(
           width: AppDimens.controlButtonWidth,
           height: AppDimens.controlButtonHeight,
-          decoration: BoxDecoration(color: AppColors.controlButton, borderRadius: BorderRadius.circular(AppDimens.radius12)),
+          decoration: BoxDecoration(
+            color: AppColors.controlButton,
+            borderRadius: BorderRadius.circular(AppDimens.radius12),
+          ),
           child: Icon(icon, color: Colors.white, size: 28),
         ),
       );
@@ -254,9 +470,15 @@ class _TimerScreenState extends State<TimerScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          button(_soundOn ? Icons.volume_up_rounded : Icons.volume_off_rounded, _toggleSound),
+          button(
+            _soundOn ? Icons.volume_up_rounded : Icons.volume_off_rounded,
+            _toggleSound,
+          ),
           button(Icons.settings_rounded, _openLiveSettings),
-          button(_isRunning ? Icons.pause_rounded : Icons.play_arrow_rounded, _toggleRunPause),
+          button(
+            _isRunning ? Icons.pause_rounded : Icons.play_arrow_rounded,
+            _toggleRunPause,
+          ),
         ],
       ),
     );
@@ -266,7 +488,24 @@ class _TimerScreenState extends State<TimerScreen> {
   void dispose() {
     _controlsAutoHideTimer?.cancel();
     _timer?.cancel();
+    _beepPlayer?.dispose();
     super.dispose();
+  }
+
+  Future<void> _initBeepPlayer() async {
+    try {
+      final player = AudioPlayer();
+      await player.setReleaseMode(ReleaseMode.stop);
+      if (!mounted) {
+        await player.dispose();
+        return;
+      }
+      _beepPlayer = player;
+      _assetBeepReady = true;
+    } catch (_) {
+      _assetBeepReady = false;
+      _beepPlayer = null;
+    }
   }
 
   void _hideControls() {
@@ -297,7 +536,27 @@ class _TimerScreenState extends State<TimerScreen> {
   //   }
   // }
 
-  Future<void> _playBeep() async => SystemSound.play(SystemSoundType.alert);
+  Future<void> _playBeep() async {
+    // Önce asset beep; plugin yoksa system sound/haptic fallback.
+    if (_assetBeepReady && _beepPlayer != null) {
+      try {
+        await _beepPlayer!.stop();
+        await _beepPlayer!.play(AssetSource('sounds/beep.wav'), volume: 1.0);
+        return;
+      } catch (_) {
+        _assetBeepReady = false;
+      }
+    }
+    try {
+      await SystemSound.play(SystemSoundType.alert);
+    } catch (_) {}
+    try {
+      await SystemSound.play(SystemSoundType.click);
+    } catch (_) {}
+    try {
+      await HapticFeedback.mediumImpact();
+    } catch (_) {}
+  }
 
   void _createTimer() {
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
@@ -333,11 +592,12 @@ class _TimerScreenState extends State<TimerScreen> {
   void _toggleRunPause() => _isRunning ? _pauseTimer() : _startTimer();
 
   void _tickBlack() {
-    final currentPhaseRemaining = _blackMainTime > 0 ? _blackMainTime : _blackByoyomiRemaining;
+    final currentPhaseRemaining = _blackMainTime > 0
+        ? _blackMainTime
+        : _blackByoyomiRemaining;
 
-    if (_soundOn && !_blackTenSecWarned && currentPhaseRemaining == 10) {
+    if (_soundOn && currentPhaseRemaining >= 5 && currentPhaseRemaining <= 10) {
       _playBeep();
-      _blackTenSecWarned = true;
     }
 
     if (_blackMainTime > 0) {
@@ -350,23 +610,32 @@ class _TimerScreenState extends State<TimerScreen> {
       return;
     }
 
+    if (widget.timeSystem == TimeSystemIds.canada) {
+      if (_blackByoyomiRemaining > 0) {
+        _blackByoyomiRemaining--;
+      } else {
+        _endGame('settingsWhite');
+      }
+      return;
+    }
+
     if (_blackByoyomiRemaining > 0) {
       _blackByoyomiRemaining--;
     } else if (_blackByoyomiCount > 0) {
       _blackByoyomiCount--;
       _blackByoyomiRemaining = widget.blackByoyomi;
-      _blackTenSecWarned = false;
     } else {
       _endGame('settingsWhite');
     }
   }
 
   void _tickWhite() {
-    final currentPhaseRemaining = _whiteMainTime > 0 ? _whiteMainTime : _whiteByoyomiRemaining;
+    final currentPhaseRemaining = _whiteMainTime > 0
+        ? _whiteMainTime
+        : _whiteByoyomiRemaining;
 
-    if (_soundOn && !_whiteTenSecWarned && currentPhaseRemaining == 10) {
+    if (_soundOn && currentPhaseRemaining >= 5 && currentPhaseRemaining <= 10) {
       _playBeep();
-      _whiteTenSecWarned = true;
     }
 
     if (_whiteMainTime > 0) {
@@ -379,12 +648,20 @@ class _TimerScreenState extends State<TimerScreen> {
       return;
     }
 
+    if (widget.timeSystem == TimeSystemIds.canada) {
+      if (_whiteByoyomiRemaining > 0) {
+        _whiteByoyomiRemaining--;
+      } else {
+        _endGame('settingsBlack');
+      }
+      return;
+    }
+
     if (_whiteByoyomiRemaining > 0) {
       _whiteByoyomiRemaining--;
     } else if (_whiteByoyomiCount > 0) {
       _whiteByoyomiCount--;
       _whiteByoyomiRemaining = widget.whiteByoyomi;
-      _whiteTenSecWarned = false;
     } else {
       _endGame('settingsBlack');
     }
@@ -398,33 +675,31 @@ class _TimerScreenState extends State<TimerScreen> {
   }
 
   void _passTurn() {
-    if (_gameEnded) return;
+    if (_gameEnded || !_isRunning) return;
 
     if (_isRunning) _timer?.cancel();
 
     setState(() {
       if (_isBlackTurn) {
         _blackMoves++;
-        _blackTenSecWarned = false;
 
-        if (widget.timeSystem == TimeSystemIds.canada) {
+        if (widget.timeSystem == TimeSystemIds.canada && _blackMainTime <= 0) {
           _blackByoyomiCount--;
 
           // 🔁 Kanada: hamleler bitince YENİ PERİYOT
-          if (_blackByoyomiCount == 0) {
+          if (_blackByoyomiCount <= 0) {
             _blackByoyomiCount = widget.blackByoyomiCount;
             _blackByoyomiRemaining = widget.blackByoyomi;
           }
         }
       } else {
         _whiteMoves++;
-        _whiteTenSecWarned = false;
 
-        if (widget.timeSystem == TimeSystemIds.canada) {
+        if (widget.timeSystem == TimeSystemIds.canada && _whiteMainTime <= 0) {
           _whiteByoyomiCount--;
 
           // 🔁 Kanada: hamleler bitince YENİ PERİYOT
-          if (_whiteByoyomiCount == 0) {
+          if (_whiteByoyomiCount <= 0) {
             _whiteByoyomiCount = widget.whiteByoyomiCount;
             _whiteByoyomiRemaining = widget.whiteByoyomi;
           }
@@ -453,8 +728,11 @@ class _TimerScreenState extends State<TimerScreen> {
     final lang = AppLanguage.current;
     final remainingLabel = AppStrings.t(lang, 'remaining');
     final mainTimeLabel = '${AppStrings.t(lang, 'mainTime')} ($remainingLabel)';
-    final byoyomiTimeLabel = '${AppStrings.t(lang, 'byoyomiTime')} ($remainingLabel)';
-    final countLabelBase = widget.timeSystem == TimeSystemIds.canada ? AppStrings.t(lang, 'canadaMoveCount') : AppStrings.t(lang, 'japanByoCount');
+    final byoyomiTimeLabel =
+        '${AppStrings.t(lang, 'byoyomiTime')} ($remainingLabel)';
+    final countLabelBase = widget.timeSystem == TimeSystemIds.canada
+        ? AppStrings.t(lang, 'canadaMoveCount')
+        : AppStrings.t(lang, 'japanByoCount');
     final countLabel = '$countLabelBase ($remainingLabel)';
     final liveSettingsTitle = AppStrings.t(lang, 'liveSettingsTitle');
     final okLabel = AppStrings.t(lang, 'ok');
@@ -471,38 +749,73 @@ class _TimerScreenState extends State<TimerScreen> {
       isDismissible: true,
       enableDrag: true,
       backgroundColor: AppColors.card,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(AppDimens.radius24))),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(AppDimens.radius24),
+        ),
+      ),
       builder: (sheetContext) {
         Widget timeTile(String title, int seconds, VoidCallback onTap) {
           return Container(
             margin: const EdgeInsets.symmetric(vertical: 6),
-            decoration: BoxDecoration(color: AppColors.controlBar.withOpacity(0.35), borderRadius: BorderRadius.circular(AppDimens.radius20)),
+            decoration: BoxDecoration(
+              color: AppColors.controlBar.withOpacity(0.35),
+              borderRadius: BorderRadius.circular(AppDimens.radius20),
+            ),
             child: ListTile(
               onTap: onTap,
               title: Text(
                 title,
-                style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: Colors.white),
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white,
+                ),
               ),
-              subtitle: Text(_formatHmsFromSeconds(seconds), style: const TextStyle(fontSize: 13, color: AppColors.textSecondary)),
+              subtitle: Text(
+                _formatHmsFromSeconds(seconds),
+                style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
+              ),
               trailing: const Icon(Icons.edit_outlined, color: Colors.white70),
             ),
           );
         }
 
-        Widget intTile(String title, int value, int min, int max, void Function(int v) onChanged) {
+        Widget intTile(
+          String title,
+          int value,
+          int min,
+          int max,
+          void Function(int v) onChanged,
+        ) {
           return Container(
             margin: const EdgeInsets.symmetric(vertical: 6),
-            decoration: BoxDecoration(color: AppColors.controlBar.withOpacity(0.35), borderRadius: BorderRadius.circular(AppDimens.radius20)),
+            decoration: BoxDecoration(
+              color: AppColors.controlBar.withOpacity(0.35),
+              borderRadius: BorderRadius.circular(AppDimens.radius20),
+            ),
             child: ListTile(
               onTap: () async {
-                final picked = await _showIntPickerLive(context: sheetContext, initial: value, min: min, max: max);
+                final picked = await _showIntPickerLive(
+                  context: sheetContext,
+                  initial: value,
+                  min: min,
+                  max: max,
+                );
                 if (picked != null) onChanged(picked);
               },
               title: Text(
                 title,
-                style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: Colors.white),
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white,
+                ),
               ),
-              subtitle: Text('$value', style: const TextStyle(fontSize: 13, color: AppColors.textSecondary)),
+              subtitle: Text(
+                '$value',
+                style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
+              ),
               trailing: const Icon(Icons.edit_outlined, color: Colors.white70),
             ),
           );
@@ -510,7 +823,12 @@ class _TimerScreenState extends State<TimerScreen> {
 
         return SafeArea(
           child: Padding(
-            padding: EdgeInsets.only(left: 20, right: 20, top: 12, bottom: 24 + MediaQuery.of(sheetContext).viewInsets.bottom),
+            padding: EdgeInsets.only(
+              left: 20,
+              right: 20,
+              top: 12,
+              bottom: 24 + MediaQuery.of(sheetContext).viewInsets.bottom,
+            ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -524,7 +842,10 @@ class _TimerScreenState extends State<TimerScreen> {
                     Container(
                       width: 46,
                       height: 5,
-                      decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(999)),
+                      decoration: BoxDecoration(
+                        color: Colors.white24,
+                        borderRadius: BorderRadius.circular(999),
+                      ),
                     ),
 
                     const SizedBox(height: 10),
@@ -535,10 +856,15 @@ class _TimerScreenState extends State<TimerScreen> {
                         // Sol: Ana sayfa butonu (pill)
                         TextButton.icon(
                           style: TextButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 10,
+                            ),
                             backgroundColor: Colors.white.withOpacity(0.06),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                            foregroundColor: Colors.redAccent,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                            foregroundColor: AppColors.accent,
                           ),
                           onPressed: () async {
                             final lang = AppLanguage.current;
@@ -549,20 +875,142 @@ class _TimerScreenState extends State<TimerScreen> {
                             final ok = AppStrings.t(lang, 'ok');
 
                             // ✅ await'ten önce navigator referanslarını al
-                            final sheetNav = Navigator.of(sheetContext, rootNavigator: true);
+                            final sheetNav = Navigator.of(
+                              sheetContext,
+                              rootNavigator: true,
+                            );
                             final mainNav = Navigator.of(context);
 
                             final bool? confirmed = await showDialog<bool>(
                               context: sheetContext,
                               barrierDismissible: false,
                               builder: (dCtx) {
-                                return AlertDialog(
-                                  title: Text(sureTitle),
-                                  content: Text(sureMsg),
-                                  actions: [
-                                    TextButton(onPressed: () => Navigator.pop(dCtx, false), child: Text(cancel)),
-                                    FilledButton(onPressed: () => Navigator.pop(dCtx, true), child: Text(ok)),
-                                  ],
+                                return Dialog(
+                                  insetPadding: const EdgeInsets.symmetric(
+                                    horizontal: 28,
+                                  ),
+                                  backgroundColor: Colors.transparent,
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: AppColors.card,
+                                      borderRadius: BorderRadius.circular(22),
+                                      border: Border.all(
+                                        color: Colors.white.withOpacity(0.08),
+                                      ),
+                                      boxShadow: const [
+                                        BoxShadow(
+                                          color: Colors.black54,
+                                          blurRadius: 26,
+                                          offset: Offset(0, 12),
+                                        ),
+                                      ],
+                                    ),
+                                    padding: const EdgeInsets.fromLTRB(
+                                      20,
+                                      20,
+                                      20,
+                                      16,
+                                    ),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Container(
+                                              width: 38,
+                                              height: 38,
+                                              decoration: BoxDecoration(
+                                                color: AppColors.accent
+                                                    .withOpacity(0.18),
+                                                borderRadius:
+                                                    BorderRadius.circular(12),
+                                              ),
+                                              child: Icon(
+                                                Icons.home_rounded,
+                                                color: AppColors.accent,
+                                                size: 22,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 12),
+                                            Expanded(
+                                              child: Text(
+                                                sureTitle,
+                                                style: const TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.w800,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 14),
+                                        Text(
+                                          sureMsg,
+                                          style: TextStyle(
+                                            color: AppColors.textSecondary,
+                                            fontSize: 14,
+                                            height: 1.35,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 18),
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: OutlinedButton(
+                                                style: OutlinedButton.styleFrom(
+                                                  foregroundColor: Colors.white,
+                                                  side: BorderSide(
+                                                    color: Colors.white
+                                                        .withOpacity(0.24),
+                                                  ),
+                                                  padding:
+                                                      const EdgeInsets.symmetric(
+                                                        vertical: 12,
+                                                      ),
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          12,
+                                                        ),
+                                                  ),
+                                                ),
+                                                onPressed: () =>
+                                                    Navigator.pop(dCtx, false),
+                                                child: Text(cancel),
+                                              ),
+                                            ),
+                                            const SizedBox(width: 10),
+                                            Expanded(
+                                              child: FilledButton(
+                                                style: FilledButton.styleFrom(
+                                                  backgroundColor:
+                                                      AppColors.accent,
+                                                  foregroundColor: Colors.white,
+                                                  padding:
+                                                      const EdgeInsets.symmetric(
+                                                        vertical: 12,
+                                                      ),
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          12,
+                                                        ),
+                                                  ),
+                                                ),
+                                                onPressed: () =>
+                                                    Navigator.pop(dCtx, true),
+                                                child: Text(ok),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                                 );
                               },
                             );
@@ -571,11 +1019,16 @@ class _TimerScreenState extends State<TimerScreen> {
                             if (confirmed != true) return;
 
                             sheetNav.pop(); // sheet kapat
-                            mainNav.popUntil((route) => route.isFirst); // ana sayfa
+                            mainNav.popUntil(
+                              (route) => route.isFirst,
+                            ); // ana sayfa
                           },
 
                           icon: const Icon(Icons.home_rounded, size: 18),
-                          label: Text(AppStrings.t(AppLanguage.current, 'backToHome'), style: const TextStyle(fontWeight: FontWeight.w700)),
+                          label: Text(
+                            AppStrings.t(AppLanguage.current, 'backToHome'),
+                            style: const TextStyle(fontWeight: FontWeight.w700),
+                          ),
                         ),
 
                         const SizedBox(width: 10),
@@ -583,9 +1036,16 @@ class _TimerScreenState extends State<TimerScreen> {
                         // Orta: Başlık
                         Expanded(
                           child: Text(
-                            AppStrings.t(AppLanguage.current, 'liveSettingsTitle'),
+                            AppStrings.t(
+                              AppLanguage.current,
+                              'liveSettingsTitle',
+                            ),
                             textAlign: TextAlign.center,
-                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: Colors.white),
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w800,
+                              color: Colors.white,
+                            ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -595,11 +1055,21 @@ class _TimerScreenState extends State<TimerScreen> {
 
                         // Sağ: Kapat (mini rounded button)
                         IconButton(
-                          onPressed: () => Navigator.of(sheetContext, rootNavigator: true).pop(),
+                          onPressed: () => Navigator.of(
+                            sheetContext,
+                            rootNavigator: true,
+                          ).pop(),
                           icon: Container(
                             padding: const EdgeInsets.all(10),
-                            decoration: BoxDecoration(color: Colors.white.withOpacity(0.06), borderRadius: BorderRadius.circular(14)),
-                            child: const Icon(Icons.close_rounded, color: Colors.white70, size: 20),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.06),
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                            child: const Icon(
+                              Icons.close_rounded,
+                              color: Colors.white70,
+                              size: 20,
+                            ),
                           ),
                         ),
                       ],
@@ -612,7 +1082,11 @@ class _TimerScreenState extends State<TimerScreen> {
                   alignment: Alignment.centerLeft,
                   child: Text(
                     liveSettingsTitle,
-                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: Colors.white),
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
                 const SizedBox(height: AppDimens.gap12),
@@ -622,20 +1096,38 @@ class _TimerScreenState extends State<TimerScreen> {
                   alignment: Alignment.centerLeft,
                   child: Text(
                     blackLabel,
-                    style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: Colors.white),
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 6),
                 timeTile(mainTimeLabel, _blackMainTime, () async {
-                  final hms = await _showTimePickerLive(context: sheetContext, initialSeconds: _blackMainTime);
+                  final hms = await _showTimePickerLive(
+                    context: sheetContext,
+                    initialSeconds: _blackMainTime,
+                  );
                   if (hms != null) setState(() => _blackMainTime = hms);
                 }),
                 if (!_isSimple) ...[
                   timeTile(byoyomiTimeLabel, _blackByoyomiRemaining, () async {
-                    final hms = await _showTimePickerLive(context: sheetContext, initialSeconds: _blackByoyomiRemaining);
-                    if (hms != null) setState(() => _blackByoyomiRemaining = hms);
+                    final hms = await _showTimePickerLive(
+                      context: sheetContext,
+                      initialSeconds: _blackByoyomiRemaining,
+                    );
+                    if (hms != null) {
+                      setState(() => _blackByoyomiRemaining = hms);
+                    }
                   }),
-                  intTile(countLabel, _blackByoyomiCount, 0, 99, (v) => setState(() => _blackByoyomiCount = v)),
+                  intTile(
+                    countLabel,
+                    _blackByoyomiCount,
+                    0,
+                    99,
+                    (v) => setState(() => _blackByoyomiCount = v),
+                  ),
                 ],
 
                 const SizedBox(height: AppDimens.gap12),
@@ -645,20 +1137,38 @@ class _TimerScreenState extends State<TimerScreen> {
                   alignment: Alignment.centerLeft,
                   child: Text(
                     whiteLabel,
-                    style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: Colors.white),
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 6),
                 timeTile(mainTimeLabel, _whiteMainTime, () async {
-                  final hms = await _showTimePickerLive(context: sheetContext, initialSeconds: _whiteMainTime);
+                  final hms = await _showTimePickerLive(
+                    context: sheetContext,
+                    initialSeconds: _whiteMainTime,
+                  );
                   if (hms != null) setState(() => _whiteMainTime = hms);
                 }),
                 if (!_isSimple) ...[
                   timeTile(byoyomiTimeLabel, _whiteByoyomiRemaining, () async {
-                    final hms = await _showTimePickerLive(context: sheetContext, initialSeconds: _whiteByoyomiRemaining);
-                    if (hms != null) setState(() => _whiteByoyomiRemaining = hms);
+                    final hms = await _showTimePickerLive(
+                      context: sheetContext,
+                      initialSeconds: _whiteByoyomiRemaining,
+                    );
+                    if (hms != null) {
+                      setState(() => _whiteByoyomiRemaining = hms);
+                    }
                   }),
-                  intTile(countLabel, _whiteByoyomiCount, 0, 99, (v) => setState(() => _whiteByoyomiCount = v)),
+                  intTile(
+                    countLabel,
+                    _whiteByoyomiCount,
+                    0,
+                    99,
+                    (v) => setState(() => _whiteByoyomiCount = v),
+                  ),
                 ],
 
                 const SizedBox(height: AppDimens.gap12),
@@ -669,11 +1179,20 @@ class _TimerScreenState extends State<TimerScreen> {
                     style: FilledButton.styleFrom(
                       backgroundColor: Colors.green,
                       foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
                       padding: const EdgeInsets.symmetric(vertical: 14),
                     ),
-                    onPressed: () => Navigator.of(sheetContext, rootNavigator: true).pop(),
-                    child: Text(okLabel, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                    onPressed: () =>
+                        Navigator.of(sheetContext, rootNavigator: true).pop(),
+                    child: Text(
+                      okLabel,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
                   ),
                 ),
               ],
@@ -694,7 +1213,10 @@ class _TimerScreenState extends State<TimerScreen> {
     return '${h.toString().padLeft(2, '0')}:${m.toString().padLeft(2, '0')}:${s.toString().padLeft(2, '0')}';
   }
 
-  Future<int?> _showTimePickerLive({required BuildContext context, required int initialSeconds}) async {
+  Future<int?> _showTimePickerLive({
+    required BuildContext context,
+    required int initialSeconds,
+  }) async {
     int h = (initialSeconds ~/ 3600).clamp(0, 9);
     int m = ((initialSeconds % 3600) ~/ 60).clamp(0, 59);
     int s = (initialSeconds % 60).clamp(0, 59);
@@ -718,9 +1240,18 @@ class _TimerScreenState extends State<TimerScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  TextButton(onPressed: () => Navigator.pop(ctx), child: Text(cancelLabel)),
-                  Text(pickLabel, style: const TextStyle(fontWeight: FontWeight.w700)),
-                  TextButton(onPressed: () => Navigator.pop(ctx, h * 3600 + m * 60 + s), child: Text(okLabel)),
+                  TextButton(
+                    onPressed: () => Navigator.pop(ctx),
+                    child: Text(cancelLabel),
+                  ),
+                  Text(
+                    pickLabel,
+                    style: const TextStyle(fontWeight: FontWeight.w700),
+                  ),
+                  TextButton(
+                    onPressed: () => Navigator.pop(ctx, h * 3600 + m * 60 + s),
+                    child: Text(okLabel),
+                  ),
                 ],
               ),
               const Divider(height: 1),
@@ -730,25 +1261,40 @@ class _TimerScreenState extends State<TimerScreen> {
                     Expanded(
                       child: CupertinoPicker(
                         itemExtent: 32,
-                        scrollController: FixedExtentScrollController(initialItem: h),
+                        scrollController: FixedExtentScrollController(
+                          initialItem: h,
+                        ),
                         onSelectedItemChanged: (v) => h = v,
-                        children: List.generate(10, (i) => Center(child: Text('$i $hourLabel'))),
+                        children: List.generate(
+                          10,
+                          (i) => Center(child: Text('$i $hourLabel')),
+                        ),
                       ),
                     ),
                     Expanded(
                       child: CupertinoPicker(
                         itemExtent: 32,
-                        scrollController: FixedExtentScrollController(initialItem: m),
+                        scrollController: FixedExtentScrollController(
+                          initialItem: m,
+                        ),
                         onSelectedItemChanged: (v) => m = v,
-                        children: List.generate(60, (i) => Center(child: Text('$i $minuteLabel'))),
+                        children: List.generate(
+                          60,
+                          (i) => Center(child: Text('$i $minuteLabel')),
+                        ),
                       ),
                     ),
                     Expanded(
                       child: CupertinoPicker(
                         itemExtent: 32,
-                        scrollController: FixedExtentScrollController(initialItem: s),
+                        scrollController: FixedExtentScrollController(
+                          initialItem: s,
+                        ),
                         onSelectedItemChanged: (v) => s = v,
-                        children: List.generate(60, (i) => Center(child: Text('$i $secondLabel'))),
+                        children: List.generate(
+                          60,
+                          (i) => Center(child: Text('$i $secondLabel')),
+                        ),
                       ),
                     ),
                   ],
@@ -761,7 +1307,12 @@ class _TimerScreenState extends State<TimerScreen> {
     );
   }
 
-  Future<int?> _showIntPickerLive({required BuildContext context, required int initial, required int min, required int max}) async {
+  Future<int?> _showIntPickerLive({
+    required BuildContext context,
+    required int initial,
+    required int min,
+    required int max,
+  }) async {
     int selected = initial.clamp(min, max);
     final itemCount = max - min + 1;
     final initialIndex = (selected - min).clamp(0, itemCount - 1);
@@ -782,18 +1333,32 @@ class _TimerScreenState extends State<TimerScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  TextButton(onPressed: () => Navigator.pop(ctx), child: Text(cancelLabel)),
-                  Text(pickLabel, style: const TextStyle(fontWeight: FontWeight.w700)),
-                  TextButton(onPressed: () => Navigator.pop(ctx, selected), child: Text(okLabel)),
+                  TextButton(
+                    onPressed: () => Navigator.pop(ctx),
+                    child: Text(cancelLabel),
+                  ),
+                  Text(
+                    pickLabel,
+                    style: const TextStyle(fontWeight: FontWeight.w700),
+                  ),
+                  TextButton(
+                    onPressed: () => Navigator.pop(ctx, selected),
+                    child: Text(okLabel),
+                  ),
                 ],
               ),
               const Divider(height: 1),
               Expanded(
                 child: CupertinoPicker(
                   itemExtent: 32,
-                  scrollController: FixedExtentScrollController(initialItem: initialIndex),
+                  scrollController: FixedExtentScrollController(
+                    initialItem: initialIndex,
+                  ),
                   onSelectedItemChanged: (index) => selected = min + index,
-                  children: List.generate(itemCount, (index) => Center(child: Text('${min + index}'))),
+                  children: List.generate(
+                    itemCount,
+                    (index) => Center(child: Text('${min + index}')),
+                  ),
                 ),
               ),
             ],
@@ -809,8 +1374,12 @@ class _TimerScreenState extends State<TimerScreen> {
       valueListenable: AppLanguage.notifier,
       builder: (context, lang, _) {
         if (_gameEnded) {
-          final winnerName = _winnerKey != null ? AppStrings.t(lang, _winnerKey!) : '';
-          final winText = winnerName.isEmpty ? AppStrings.t(lang, 'won') : '$winnerName ${AppStrings.t(lang, 'won')}';
+          final winnerName = _winnerKey != null
+              ? AppStrings.t(lang, _winnerKey!)
+              : '';
+          final winText = winnerName.isEmpty
+              ? AppStrings.t(lang, 'won')
+              : '$winnerName ${AppStrings.t(lang, 'won')}';
 
           return Scaffold(
             body: Container(
@@ -821,7 +1390,11 @@ class _TimerScreenState extends State<TimerScreen> {
                   children: [
                     Text(
                       winText,
-                      style: const TextStyle(fontSize: 60, fontWeight: FontWeight.bold, color: Colors.white, fontFamily: 'SF Pro Display'),
+                      style: const TextStyle(
+                        fontSize: 60,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 40),
@@ -829,13 +1402,22 @@ class _TimerScreenState extends State<TimerScreen> {
                       style: FilledButton.styleFrom(
                         backgroundColor: Colors.white,
                         foregroundColor: Colors.red,
-                        padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 40,
+                          vertical: 16,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
                       ),
-                      onPressed: () => Navigator.popUntil(context, (route) => route.isFirst),
+                      onPressed: () =>
+                          Navigator.popUntil(context, (route) => route.isFirst),
                       child: Text(
                         AppStrings.t(lang, 'backToHome'),
-                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600, fontFamily: 'SF Pro Text'),
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ],
@@ -872,7 +1454,10 @@ class _TimerScreenState extends State<TimerScreen> {
               Expanded(
                 child: GestureDetector(
                   behavior: HitTestBehavior.opaque,
-                  onTap: _passTurn,
+                  onTap: () {
+                    // Siyah oyuncu sadece kendi sırasıysa basınca geçsin
+                    if (_isRunning && _isBlackTurn) _passTurn();
+                  },
                   child: _buildPlayerArea(
                     lang: lang,
                     isTop: false,
@@ -902,8 +1487,12 @@ class _TimerScreenState extends State<TimerScreen> {
     required int moves,
     required bool isActive,
   }) {
-    final Color backgroundColor = isActive ? AppColors.active : (isBlack ? AppColors.blackBase : AppColors.whiteBase);
-    final Color textColor = isActive ? const Color(0xFF222222) : (isBlack ? Colors.white : const Color(0xFF111111));
+    final Color backgroundColor = isActive
+        ? AppColors.active
+        : (isBlack ? AppColors.blackBase : AppColors.whiteBase);
+    final Color textColor = isActive
+        ? const Color(0xFF222222)
+        : (isBlack ? Colors.white : const Color(0xFF111111));
 
     final currentDisplayTime = mainTime > 0 ? mainTime : byoyomiRemaining;
 
@@ -914,10 +1503,14 @@ class _TimerScreenState extends State<TimerScreen> {
       final fixedSec = isBlack ? widget.blackByoyomi : widget.whiteByoyomi;
       if (widget.timeSystem == TimeSystemIds.byoyomi) {
         final template = AppStrings.t(lang, 'timerJapanInfo');
-        byoyomiInfo = template.replaceFirst('{count}', '$byoyomiCount').replaceFirst('{seconds}', '$fixedSec');
+        byoyomiInfo = template
+            .replaceFirst('{count}', '$byoyomiCount')
+            .replaceFirst('{seconds}', '$fixedSec');
       } else if (widget.timeSystem == TimeSystemIds.canada) {
         final template = AppStrings.t(lang, 'timerCanadaInfo');
-        byoyomiInfo = template.replaceFirst('{count}', '$byoyomiCount').replaceFirst('{seconds}', '$fixedSec');
+        byoyomiInfo = template
+            .replaceFirst('{count}', '$byoyomiCount')
+            .replaceFirst('{seconds}', '$fixedSec');
       }
     }
 
@@ -934,18 +1527,33 @@ class _TimerScreenState extends State<TimerScreen> {
           children: [
             Align(
               alignment: Alignment.topRight,
-              child: Text('$movesLabel: $moves', style: TextStyle(fontSize: 14, color: textColor.withOpacity(0.8))),
+              child: Text(
+                '$movesLabel: $moves',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: textColor.withOpacity(0.8),
+                ),
+              ),
             ),
             const SizedBox(height: AppDimens.gap8),
             Text(
               _formatTime(currentDisplayTime),
-              style: TextStyle(fontSize: 80, fontWeight: FontWeight.w800, letterSpacing: 2, color: textColor),
+              style: TextStyle(
+                fontSize: 80,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 2,
+                color: textColor,
+              ),
             ),
             if (byoyomiInfo.isNotEmpty) ...[
               const SizedBox(height: AppDimens.gap8),
               Text(
                 byoyomiInfo,
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600, color: textColor.withOpacity(0.9)),
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                  color: textColor.withOpacity(0.9),
+                ),
               ),
             ],
           ],
@@ -1020,13 +1628,14 @@ class _TimerSettingsScreenState extends State<TimerSettingsScreen> {
       valueListenable: AppLanguage.notifier,
       builder: (context, lang, _) {
         final systemLabel = _timeSystemLabel(lang);
-        final title = AppStrings.t(lang, 'settingsTitle').replaceFirst('{system}', systemLabel);
+        final title = AppStrings.t(
+          lang,
+          'settingsTitle',
+        ).replaceFirst('{system}', systemLabel);
 
         return Scaffold(
           appBar: AppBar(title: Text(title)),
           body: AppBackground(
-            imagePath1: 'assets/background/background_2.png',
-            imagePath2: null,
             child: SingleChildScrollView(
               padding: AppDimens.screenPadding,
               child: Column(
@@ -1051,25 +1660,40 @@ class _TimerSettingsScreenState extends State<TimerSettingsScreen> {
                     },
                     title: Text(
                       AppStrings.t(lang, 'settingsDifferent'),
-                      style: const TextStyle(fontFamily: 'SF Pro Text', fontWeight: FontWeight.w600, fontSize: 15, color: Colors.white70),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 15,
+                        color: Colors.white70,
+                      ),
                     ),
                   ),
                   const SizedBox(height: AppDimens.gap16),
-                  if (!_useDifferentSettings) _buildCommonBlock(lang) else _buildDifferentBlock(lang),
+                  if (!_useDifferentSettings)
+                    _buildCommonBlock(lang)
+                  else
+                    _buildDifferentBlock(lang),
                   const SizedBox(height: AppDimens.gap32),
                   SizedBox(
                     width: double.infinity,
                     child: FilledButton(
                       style: FilledButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 16),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 50,
+                          vertical: 16,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
                         backgroundColor: Colors.green,
                         foregroundColor: Colors.white,
                       ),
                       onPressed: _onStartPressed,
                       child: Text(
                         AppStrings.t(lang, 'btnStart'),
-                        style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600, fontFamily: 'SF Pro Text'),
+                        style: const TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ),
@@ -1100,7 +1724,7 @@ class _TimerSettingsScreenState extends State<TimerSettingsScreen> {
       children: [
         Text(
           AppStrings.t(lang, 'settingsBlack'),
-          style: const TextStyle(fontFamily: 'SF Pro Display', fontSize: 18, fontWeight: FontWeight.w600),
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: AppDimens.gap8),
         _buildPlayerBlock(
@@ -1127,7 +1751,7 @@ class _TimerSettingsScreenState extends State<TimerSettingsScreen> {
         const SizedBox(height: AppDimens.gap24),
         Text(
           AppStrings.t(lang, 'settingsWhite'),
-          style: const TextStyle(fontFamily: 'SF Pro Display', fontSize: 18, fontWeight: FontWeight.w600),
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: AppDimens.gap8),
         _buildPlayerBlock(
@@ -1203,7 +1827,12 @@ class _TimerSettingsScreenState extends State<TimerSettingsScreen> {
           label: mainLabel,
           subtitle: _formatHms(mainH, mainM, mainS),
           onTap: () async {
-            final result = await _showTimePicker(context: context, initialH: mainH, initialM: mainM, initialS: mainS);
+            final result = await _showTimePicker(
+              context: context,
+              initialH: mainH,
+              initialM: mainM,
+              initialS: mainS,
+            );
             if (result != null) onMainChanged(result.h, result.m, result.s);
           },
         ),
@@ -1215,8 +1844,15 @@ class _TimerSettingsScreenState extends State<TimerSettingsScreen> {
                 label: byoyomiLabel,
                 subtitle: _formatHms(byoH, byoM, byoS),
                 onTap: () async {
-                  final result = await _showTimePicker(context: context, initialH: byoH, initialM: byoM, initialS: byoS);
-                  if (result != null) onByoChanged(result.h, result.m, result.s);
+                  final result = await _showTimePicker(
+                    context: context,
+                    initialH: byoH,
+                    initialM: byoM,
+                    initialS: byoS,
+                  );
+                  if (result != null) {
+                    onByoChanged(result.h, result.m, result.s);
+                  }
                 },
               ),
               const SizedBox(height: AppDimens.gap16),
@@ -1225,7 +1861,12 @@ class _TimerSettingsScreenState extends State<TimerSettingsScreen> {
                   label: _isCanada ? canadaLabel : japanLabel,
                   value: byoCount,
                   onTap: () async {
-                    final value = await _showIntPicker(context: context, initial: byoCount, min: 1, max: 40);
+                    final value = await _showIntPicker(
+                      context: context,
+                      initial: byoCount,
+                      min: 1,
+                      max: 40,
+                    );
                     if (value != null) onCountChanged(value);
                   },
                 ),
@@ -1237,7 +1878,9 @@ class _TimerSettingsScreenState extends State<TimerSettingsScreen> {
 
   void _onStartPressed() {
     final blackMainSec = _toSeconds(_blackMainH, _blackMainM, _blackMainS);
-    final whiteMainSec = _useDifferentSettings ? _toSeconds(_whiteMainH, _whiteMainM, _whiteMainS) : blackMainSec;
+    final whiteMainSec = _useDifferentSettings
+        ? _toSeconds(_whiteMainH, _whiteMainM, _whiteMainS)
+        : blackMainSec;
 
     int blackByoSec = 0;
     int whiteByoSec = 0;
@@ -1273,49 +1916,92 @@ class _TimerSettingsScreenState extends State<TimerSettingsScreen> {
     );
   }
 
-  Widget _buildTimeTile({required String label, required String subtitle, required VoidCallback onTap}) {
+  Widget _buildTimeTile({
+    required String label,
+    required String subtitle,
+    required VoidCallback onTap,
+  }) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 6),
-      decoration: BoxDecoration(color: AppColors.card, borderRadius: BorderRadius.circular(AppDimens.radius20)),
+      decoration: BoxDecoration(
+        color: AppColors.card,
+        borderRadius: BorderRadius.circular(AppDimens.radius20),
+      ),
       child: ListTile(
         onTap: onTap,
         contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
         title: Text(
           label,
-          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Colors.white),
+          style: const TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.w600,
+            color: Colors.white,
+          ),
         ),
-        subtitle: Text(subtitle, style: const TextStyle(fontSize: 13, color: AppColors.textSecondary)),
+        subtitle: Text(
+          subtitle,
+          style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
+        ),
         trailing: Container(
           padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(color: Colors.white.withOpacity(0.08), borderRadius: BorderRadius.circular(AppDimens.radius12)),
-          child: const Icon(Icons.mode_edit_outline_rounded, size: 20, color: Colors.white),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.08),
+            borderRadius: BorderRadius.circular(AppDimens.radius12),
+          ),
+          child: const Icon(
+            Icons.mode_edit_outline_rounded,
+            size: 20,
+            color: Colors.white,
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildIntTile({required String label, required int value, required VoidCallback onTap}) {
+  Widget _buildIntTile({
+    required String label,
+    required int value,
+    required VoidCallback onTap,
+  }) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 6),
-      decoration: BoxDecoration(color: AppColors.card, borderRadius: BorderRadius.circular(AppDimens.radius20)),
+      decoration: BoxDecoration(
+        color: AppColors.card,
+        borderRadius: BorderRadius.circular(AppDimens.radius20),
+      ),
       child: ListTile(
         onTap: onTap,
         contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
         title: Text(
           label,
-          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Colors.white),
+          style: const TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.w600,
+            color: Colors.white,
+          ),
         ),
-        subtitle: Text('$value', style: const TextStyle(fontSize: 13, color: AppColors.textSecondary)),
+        subtitle: Text(
+          '$value',
+          style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
+        ),
         trailing: Container(
           padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(color: Colors.white.withOpacity(0.08), borderRadius: BorderRadius.circular(AppDimens.radius12)),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.08),
+            borderRadius: BorderRadius.circular(AppDimens.radius12),
+          ),
           child: const Icon(Icons.edit_outlined, size: 20, color: Colors.white),
         ),
       ),
     );
   }
 
-  Future<_Hms?> _showTimePicker({required BuildContext context, required int initialH, required int initialM, required int initialS}) async {
+  Future<_Hms?> _showTimePicker({
+    required BuildContext context,
+    required int initialH,
+    required int initialM,
+    required int initialS,
+  }) async {
     int selectedH = initialH;
     int selectedM = initialM;
     int selectedS = initialS;
@@ -1338,12 +2024,21 @@ class _TimerSettingsScreenState extends State<TimerSettingsScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  TextButton(onPressed: () => Navigator.pop(ctx), child: Text(cancelLabel)),
+                  TextButton(
+                    onPressed: () => Navigator.pop(ctx),
+                    child: Text(cancelLabel),
+                  ),
                   Text(
                     pickLabel,
-                    style: const TextStyle(fontFamily: 'SF Pro Text', fontWeight: FontWeight.w600),
+                    style: const TextStyle(fontWeight: FontWeight.w600),
                   ),
-                  TextButton(onPressed: () => Navigator.pop(ctx, _Hms(selectedH, selectedM, selectedS)), child: Text(okLabel)),
+                  TextButton(
+                    onPressed: () => Navigator.pop(
+                      ctx,
+                      _Hms(selectedH, selectedM, selectedS),
+                    ),
+                    child: Text(okLabel),
+                  ),
                 ],
               ),
               const Divider(height: 1),
@@ -1353,25 +2048,40 @@ class _TimerSettingsScreenState extends State<TimerSettingsScreen> {
                     Expanded(
                       child: CupertinoPicker(
                         itemExtent: 32,
-                        scrollController: FixedExtentScrollController(initialItem: initialH),
+                        scrollController: FixedExtentScrollController(
+                          initialItem: initialH,
+                        ),
                         onSelectedItemChanged: (value) => selectedH = value,
-                        children: List.generate(10, (index) => Center(child: Text('$index $hourLabel'))),
+                        children: List.generate(
+                          10,
+                          (index) => Center(child: Text('$index $hourLabel')),
+                        ),
                       ),
                     ),
                     Expanded(
                       child: CupertinoPicker(
                         itemExtent: 32,
-                        scrollController: FixedExtentScrollController(initialItem: initialM),
+                        scrollController: FixedExtentScrollController(
+                          initialItem: initialM,
+                        ),
                         onSelectedItemChanged: (value) => selectedM = value,
-                        children: List.generate(60, (index) => Center(child: Text('$index $minuteLabel'))),
+                        children: List.generate(
+                          60,
+                          (index) => Center(child: Text('$index $minuteLabel')),
+                        ),
                       ),
                     ),
                     Expanded(
                       child: CupertinoPicker(
                         itemExtent: 32,
-                        scrollController: FixedExtentScrollController(initialItem: initialS),
+                        scrollController: FixedExtentScrollController(
+                          initialItem: initialS,
+                        ),
                         onSelectedItemChanged: (value) => selectedS = value,
-                        children: List.generate(60, (index) => Center(child: Text('$index $secondLabel'))),
+                        children: List.generate(
+                          60,
+                          (index) => Center(child: Text('$index $secondLabel')),
+                        ),
                       ),
                     ),
                   ],
@@ -1384,7 +2094,12 @@ class _TimerSettingsScreenState extends State<TimerSettingsScreen> {
     );
   }
 
-  Future<int?> _showIntPicker({required BuildContext context, required int initial, required int min, required int max}) async {
+  Future<int?> _showIntPicker({
+    required BuildContext context,
+    required int initial,
+    required int min,
+    required int max,
+  }) async {
     int selected = initial.clamp(min, max);
     final itemCount = max - min + 1;
     final initialIndex = (selected - min).clamp(0, itemCount - 1);
@@ -1404,21 +2119,32 @@ class _TimerSettingsScreenState extends State<TimerSettingsScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  TextButton(onPressed: () => Navigator.pop(ctx), child: Text(cancelLabel)),
+                  TextButton(
+                    onPressed: () => Navigator.pop(ctx),
+                    child: Text(cancelLabel),
+                  ),
                   Text(
                     pickLabel,
-                    style: const TextStyle(fontFamily: 'SF Pro Text', fontWeight: FontWeight.w600),
+                    style: const TextStyle(fontWeight: FontWeight.w600),
                   ),
-                  TextButton(onPressed: () => Navigator.pop(ctx, selected), child: Text(okLabel)),
+                  TextButton(
+                    onPressed: () => Navigator.pop(ctx, selected),
+                    child: Text(okLabel),
+                  ),
                 ],
               ),
               const Divider(height: 1),
               Expanded(
                 child: CupertinoPicker(
                   itemExtent: 32,
-                  scrollController: FixedExtentScrollController(initialItem: initialIndex),
+                  scrollController: FixedExtentScrollController(
+                    initialItem: initialIndex,
+                  ),
                   onSelectedItemChanged: (index) => selected = min + index,
-                  children: List.generate(itemCount, (index) => Center(child: Text('${min + index}'))),
+                  children: List.generate(
+                    itemCount,
+                    (index) => Center(child: Text('${min + index}')),
+                  ),
                 ),
               ),
             ],

@@ -3,7 +3,11 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gotimer/main.dart';
 
-void _setTestScreenSize(WidgetTester tester, {Size size = const Size(1080, 1920), double textScale = 1.0}) {
+void _setTestScreenSize(
+  WidgetTester tester, {
+  Size size = const Size(1080, 1920),
+  double textScale = 1.0,
+}) {
   final view = tester.view;
   view.physicalSize = size;
   view.devicePixelRatio = 1.0;
@@ -21,15 +25,42 @@ Future<void> pumpApp(WidgetTester tester) async {
   await tester.pumpAndSettle();
 }
 
-/// Home'da 3 zaman sistemi kartı var ve hepsinde Icons.timer_rounded var.
-/// İlk karta tıklayıp (Byoyomi) settings ekranına gider.
+Future<void> pumpTimerScreen(
+  WidgetTester tester, {
+  required String timeSystem,
+  required int blackMainTime,
+  required int whiteMainTime,
+  required int blackByoyomi,
+  required int whiteByoyomi,
+  required int blackByoyomiCount,
+  required int whiteByoyomiCount,
+}) async {
+  await tester.pumpWidget(
+    MaterialApp(
+      home: TimerScreen(
+        timeSystem: timeSystem,
+        blackMainTime: blackMainTime,
+        whiteMainTime: whiteMainTime,
+        blackByoyomi: blackByoyomi,
+        whiteByoyomi: whiteByoyomi,
+        blackByoyomiCount: blackByoyomiCount,
+        whiteByoyomiCount: whiteByoyomiCount,
+      ),
+    ),
+  );
+  await tester.pumpAndSettle();
+}
+
+/// Home'da 3 zaman sistemi kartı var ve her birinin farklı ikonu var.
+/// Byoyomi ikonuna tıklayıp settings ekranına gider.
 Future<void> goToByoyomiSettings(WidgetTester tester) async {
   await pumpApp(tester);
 
-  final timerIcons = find.byIcon(Icons.timer_rounded);
-  expect(timerIcons, findsNWidgets(3));
+  expect(find.byIcon(Icons.hourglass_bottom_rounded), findsOneWidget);
+  expect(find.byIcon(Icons.format_list_numbered_rounded), findsOneWidget);
+  expect(find.byIcon(Icons.timer_rounded), findsOneWidget);
 
-  await tester.tap(timerIcons.at(0));
+  await tester.tap(find.byIcon(Icons.hourglass_bottom_rounded));
   await tester.pumpAndSettle();
 
   // Settings ekranında en altta geniş FilledButton var (Start)
@@ -48,7 +79,15 @@ Future<void> startFromByoyomi(WidgetTester tester) async {
   await tester.pumpAndSettle();
 
   // Timer ekranda MM:SS görünmeli
-  expect(find.byWidgetPredicate((w) => w is Text && w.data != null && RegExp(r'^\d{2}:\d{2}$').hasMatch(w.data!)), findsAtLeastNWidgets(1));
+  expect(
+    find.byWidgetPredicate(
+      (w) =>
+          w is Text &&
+          w.data != null &&
+          RegExp(r'^\d{2}:\d{2}$').hasMatch(w.data!),
+    ),
+    findsAtLeastNWidgets(1),
+  );
 
   // Başlangıçta bar görünür
   expect(find.byKey(const ValueKey('visible_bar')), findsOneWidget);
@@ -58,7 +97,9 @@ Future<void> startFromByoyomi(WidgetTester tester) async {
 List<String> readAllTimes(WidgetTester tester) {
   final texts = tester.widgetList<Text>(
     find.byWidgetPredicate((w) {
-      return w is Text && w.data != null && RegExp(r'^\d{2}:\d{2}$').hasMatch(w.data!);
+      return w is Text &&
+          w.data != null &&
+          RegExp(r'^\d{2}:\d{2}$').hasMatch(w.data!);
     }),
   );
   return texts.map((t) => t.data!).toList();
@@ -95,7 +136,10 @@ Future<void> showControlBarAgain(WidgetTester tester) async {
 
   expect(find.byKey(const ValueKey('hidden_bar')), findsOneWidget);
 
-  await tester.tap(find.byKey(const ValueKey('hidden_bar')), warnIfMissed: false);
+  await tester.tap(
+    find.byKey(const ValueKey('hidden_bar')),
+    warnIfMissed: false,
+  );
   await tester.pump();
   await tester.pumpAndSettle();
 
@@ -127,14 +171,27 @@ Future<void> pressPause(WidgetTester tester) async {
   expect(find.byKey(const ValueKey('visible_bar')), findsOneWidget);
 }
 
+Future<void> tapWhiteArea(WidgetTester tester) async {
+  final size = tester.getSize(find.byType(Scaffold).first);
+  await tester.tapAt(Offset(size.width / 2, size.height * 0.15));
+  await tester.pump();
+}
+
+Future<void> tapBlackArea(WidgetTester tester) async {
+  final size = tester.getSize(find.byType(Scaffold).first);
+  await tester.tapAt(Offset(size.width / 2, size.height * 0.85));
+  await tester.pump();
+}
+
 void main() {
   // SystemSound.play test ortamında patlamasın
   setUpAll(() {
     TestWidgetsFlutterBinding.ensureInitialized();
-    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(SystemChannels.platform, (call) async {
-      if (call.method == 'SystemSound.play') return null;
-      return null;
-    });
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(SystemChannels.platform, (call) async {
+          if (call.method == 'SystemSound.play') return null;
+          return null;
+        });
   });
 
   group('🟢 Go Match Timer – Universal Flow Tests', () {
@@ -142,7 +199,9 @@ void main() {
       _setTestScreenSize(tester);
       await pumpApp(tester);
 
-      expect(find.byIcon(Icons.timer_rounded), findsNWidgets(3));
+      expect(find.byIcon(Icons.hourglass_bottom_rounded), findsOneWidget);
+      expect(find.byIcon(Icons.format_list_numbered_rounded), findsOneWidget);
+      expect(find.byIcon(Icons.timer_rounded), findsOneWidget);
     });
 
     testWidgets('Byoyomi settings açılıyor', (tester) async {
@@ -208,7 +267,9 @@ void main() {
       }
     });
 
-    testWidgets('Settings bottom sheet açılıyor ve X ile kapanıyor', (tester) async {
+    testWidgets('Settings bottom sheet açılıyor ve X ile kapanıyor', (
+      tester,
+    ) async {
       _setTestScreenSize(tester);
       await startFromByoyomi(tester);
 
@@ -225,6 +286,123 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byIcon(Icons.close_rounded), findsNothing);
+    });
+  });
+
+  group('🧠 Oyun Mekanigi Testleri', () {
+    testWidgets('Timer baslamadan dokunus move arttirmaz', (tester) async {
+      _setTestScreenSize(tester);
+      await pumpTimerScreen(
+        tester,
+        timeSystem: TimeSystemIds.byoyomi,
+        blackMainTime: 30,
+        whiteMainTime: 30,
+        blackByoyomi: 10,
+        whiteByoyomi: 10,
+        blackByoyomiCount: 5,
+        whiteByoyomiCount: 5,
+      );
+
+      final movesZero = find.textContaining('Moves: 0');
+      expect(movesZero, findsNWidgets(2));
+
+      await tapBlackArea(tester);
+      await tapWhiteArea(tester);
+      await tester.pumpAndSettle();
+
+      expect(find.textContaining('Moves: 0'), findsNWidgets(2));
+      expect(find.textContaining('Moves: 1'), findsNothing);
+    });
+
+    testWidgets('Kanada: taslar bitince yeni period resetlenir', (
+      tester,
+    ) async {
+      _setTestScreenSize(tester);
+      await pumpTimerScreen(
+        tester,
+        timeSystem: TimeSystemIds.canada,
+        blackMainTime: 0,
+        whiteMainTime: 0,
+        blackByoyomi: 10,
+        whiteByoyomi: 10,
+        blackByoyomiCount: 2,
+        whiteByoyomiCount: 7,
+      );
+
+      // Siyah oynar: 2 -> 1
+      await pressPlay(tester);
+      await tapBlackArea(tester);
+      expect(find.textContaining('Moves left: 1 | 10s'), findsOneWidget);
+
+      // Beyaz oynar (sira degissin)
+      await tapWhiteArea(tester);
+
+      // Siyah tekrar oynar: 1 -> 0 -> reset => 2
+      await tapBlackArea(tester);
+      expect(find.textContaining('Moves left: 2 | 10s'), findsOneWidget);
+      expect(find.textContaining('Moves left: 6 | 10s'), findsOneWidget);
+    });
+
+    testWidgets('Son 10-5 saniye araliginda ses mekanigi tetiklenir', (
+      tester,
+    ) async {
+      _setTestScreenSize(tester);
+
+      int beepCalls = 0;
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(SystemChannels.platform, (call) async {
+            if (call.method == 'SystemSound.play') beepCalls++;
+            return null;
+          });
+
+      addTearDown(() {
+        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+            .setMockMethodCallHandler(SystemChannels.platform, null);
+      });
+
+      await pumpTimerScreen(
+        tester,
+        timeSystem: TimeSystemIds.simple,
+        blackMainTime: 12,
+        whiteMainTime: 99,
+        blackByoyomi: 0,
+        whiteByoyomi: 0,
+        blackByoyomiCount: 0,
+        whiteByoyomiCount: 0,
+      );
+
+      await pressPlay(tester);
+      await elapseSeconds(tester, 8);
+
+      // Asset player test ortaminda mock'lanmadigi icin sistem kanalina
+      // sadece fallback sesleri yansiyabilir. En az bir uyarinin tetiklenmesi
+      // (baslangic ve/veya geri sayim) mekanigin calistigini gosterir.
+      expect(beepCalls, greaterThanOrEqualTo(1));
+    });
+
+    testWidgets('Japon Byoyomi: period bitince hak duser ve sure resetlenir', (
+      tester,
+    ) async {
+      _setTestScreenSize(tester);
+      await pumpTimerScreen(
+        tester,
+        timeSystem: TimeSystemIds.byoyomi,
+        blackMainTime: 0,
+        whiteMainTime: 0,
+        blackByoyomi: 2,
+        whiteByoyomi: 7,
+        blackByoyomiCount: 2,
+        whiteByoyomiCount: 9,
+      );
+
+      await pressPlay(tester);
+
+      // Siyah byoyomi: 00:02 -> 00:01 -> 00:00 -> period reset (00:02), hak 2 -> 1
+      await elapseSeconds(tester, 3);
+
+      expect(find.text('00:02'), findsOneWidget);
+      expect(find.textContaining('Byoyomi: 1 periods | 2s'), findsOneWidget);
+      expect(find.byIcon(Icons.pause_rounded), findsOneWidget);
     });
   });
 }

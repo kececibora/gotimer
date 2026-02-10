@@ -18,6 +18,8 @@ dependencies:
   # Çoklu dil desteği
   easy_localization: ^3.0.5
   flutter_launcher_icons: ^0.14.4
+  audioplayers: ^6.5.1
+  shared_preferences: ^2.5.4
 
 dev_dependencies:
   flutter_test:
@@ -44,3 +46,4 @@ flutter:
   assets:
     - assets/icon/app_icon.png
     - assets/background/
+    - assets/sounds/beep.wav

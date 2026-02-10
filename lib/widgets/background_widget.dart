@@ -2,16 +2,26 @@
 import 'package:flutter/material.dart';
 import 'package:gotimer/ui/app_colors.dart';
 import 'package:gotimer/ui/app_dimens.dart';
+import 'package:gotimer/ui/app_theme.dart';
 
 class AppBackground extends StatelessWidget {
-  final String imagePath1;
+  final String? imagePath1;
   final String? imagePath2; // 👈 opsiyonel
   final Widget child;
 
-  const AppBackground({super.key, required this.imagePath1, this.imagePath2, required this.child});
+  const AppBackground({
+    super.key,
+    this.imagePath1,
+    this.imagePath2,
+    required this.child,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final palette = AppThemeController.palette;
+    final topImagePath = imagePath1 ?? palette.backgroundImage1;
+    final secondImagePath = imagePath2 ?? palette.backgroundImage2;
+
     return Stack(
       children: [
         Container(color: AppColors.bg),
@@ -21,30 +31,53 @@ class AppBackground extends StatelessWidget {
           top: 0,
           left: 0,
           right: 0,
-          child: Image.asset(imagePath1, fit: BoxFit.cover, height: AppDimens.bgImageHeight),
+          child: Image.asset(
+            topImagePath,
+            fit: BoxFit.cover,
+            height: AppDimens.bgImageHeight,
+          ),
         ),
 
         // Background 2 (SADECE varsa)
-        if (imagePath2 != null)
+        if (secondImagePath != null)
           Positioned(
             top: 0,
             left: 0,
             right: 0,
             child: Opacity(
               opacity: 0.85,
-              child: Image.asset(imagePath2!, fit: BoxFit.cover, height: AppDimens.bgImageHeight),
+              child: Image.asset(
+                secondImagePath,
+                fit: BoxFit.cover,
+                height: AppDimens.bgImageHeight,
+              ),
+            ),
+          ),
+
+        if (palette.backgroundTintOpacity > 0)
+          Positioned.fill(
+            child: IgnorePointer(
+              child: Container(
+                color: palette.backgroundTint.withValues(
+                  alpha: palette.backgroundTintOpacity,
+                ),
+              ),
             ),
           ),
 
         // Gradient (istersen bunu da opsiyonel yapabiliriz)
-        const Positioned(
+        Positioned(
           top: 0,
           left: 0,
           right: 0,
           height: AppDimens.bgGradientHeight,
           child: DecoratedBox(
             decoration: BoxDecoration(
-              gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Colors.black54, Colors.transparent]),
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [AppColors.gradientTop, Colors.transparent],
+              ),
             ),
           ),
         ),

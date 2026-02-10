@@ -20,10 +20,19 @@ class InfoButton extends StatelessWidget {
       onTap: () => _showInfo(context),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-        decoration: BoxDecoration(color: AppColors.card, borderRadius: BorderRadius.circular(AppDimens.radius20)),
+        decoration: BoxDecoration(
+          color: AppColors.card,
+          borderRadius: BorderRadius.circular(AppDimens.radius20),
+        ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
-          children: const [Icon(Icons.info_outline_rounded, size: 32, color: AppColors.textSecondary)],
+          children: [
+            Icon(
+              Icons.info_outline_rounded,
+              size: 32,
+              color: AppColors.textSecondary,
+            ),
+          ],
         ),
       ),
     );
@@ -37,7 +46,11 @@ class InfoButton extends StatelessWidget {
       isDismissible: true,
       enableDrag: true,
       isScrollControlled: true,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(AppDimens.radius24))),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(AppDimens.radius24),
+        ),
+      ),
       builder: (sheetContext) {
         return SafeArea(
           child: Padding(
@@ -53,15 +66,24 @@ class InfoButton extends StatelessWidget {
                         child: Container(
                           width: 40,
                           height: 4,
-                          decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(999)),
+                          decoration: BoxDecoration(
+                            color: Colors.white24,
+                            borderRadius: BorderRadius.circular(999),
+                          ),
                         ),
                       ),
                     ),
                     IconButton(
                       onPressed: () {
-                        Navigator.of(context, rootNavigator: true).pop(); // ✅ sağlam kapatma
+                        Navigator.of(
+                          context,
+                          rootNavigator: true,
+                        ).pop(); // ✅ sağlam kapatma
                       },
-                      icon: const Icon(Icons.close_rounded, color: Colors.white70),
+                      icon: const Icon(
+                        Icons.close_rounded,
+                        color: Colors.white70,
+                      ),
                     ),
                   ],
                 ),
@@ -70,18 +92,40 @@ class InfoButton extends StatelessWidget {
 
                 Text(
                   AppStrings.t(languageCode, 'infoTitle'),
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Colors.white),
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                  ),
                 ),
                 const SizedBox(height: AppDimens.gap16),
 
-                _buildLinkRow(label: AppStrings.t(languageCode, 'infoSoftware'), name: 'rbkececi', url: 'https://www.linkedin.com/in/borakececi/'),
+                _buildLinkRow(
+                  label: AppStrings.t(languageCode, 'infoSoftware'),
+                  name: 'rbkececi',
+                  url: 'https://www.linkedin.com/in/borakececi/',
+                ),
                 const SizedBox(height: AppDimens.gap10),
-                _buildLinkRow(label: AppStrings.t(languageCode, 'infoDesign'), name: 'mkrst', url: 'https://www.linkedin.com/in/m-kursat-elitok/'),
+                _buildLinkRow(
+                  label: AppStrings.t(languageCode, 'infoDesign'),
+                  name: 'mkrst',
+                  url: 'https://www.linkedin.com/in/m-kursat-elitok/',
+                ),
 
                 const SizedBox(height: AppDimens.gap16),
-                Text(AppStrings.t(languageCode, 'infoThanks'), style: const TextStyle(fontSize: 13, color: AppColors.textSecondary)),
+                Text(
+                  AppStrings.t(languageCode, 'infoThanks'),
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
                 const SizedBox(height: AppDimens.gap8),
-                _buildLinkRow(label: '', name: 'Eskişehir Go Oyuncuları Derneği', url: 'https://www.instagram.com/eskisehirgooyunculari/'),
+                _buildLinkRow(
+                  label: '',
+                  name: 'Eskişehir Go Oyuncuları Derneği',
+                  url: 'https://www.instagram.com/eskisehirgooyunculari/',
+                ),
               ],
             ),
           ),
@@ -90,21 +134,37 @@ class InfoButton extends StatelessWidget {
     );
   }
 
-  Widget _buildLinkRow({required String label, required String name, required String url}) {
+  Widget _buildLinkRow({
+    required String label,
+    required String name,
+    required String url,
+  }) {
     return InkWell(
       onTap: () => _launchExternal(url),
       child: Row(
         children: [
-          if (label.isNotEmpty) Text(label, style: const TextStyle(fontSize: 13, color: AppColors.textSecondary)),
+          if (label.isNotEmpty)
+            Text(
+              label,
+              style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
+            ),
           if (label.isNotEmpty) const SizedBox(width: AppDimens.gap4),
           Flexible(
             child: Text(
               name,
-              style: const TextStyle(fontSize: 14, color: Colors.white, decoration: TextDecoration.underline),
+              style: const TextStyle(
+                fontSize: 14,
+                color: Colors.white,
+                decoration: TextDecoration.underline,
+              ),
             ),
           ),
           const SizedBox(width: AppDimens.gap4),
-          const Icon(Icons.open_in_new_rounded, size: 14, color: AppColors.textSecondary),
+          Icon(
+            Icons.open_in_new_rounded,
+            size: 14,
+            color: AppColors.textSecondary,
+          ),
         ],
       ),
     );
