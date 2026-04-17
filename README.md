@@ -1,8 +1,8 @@
 <div align="center">
-  <img src="assets/esgo_logo.png" width="120" alt="Go Match Timer Logo"/>
+
 
 # 🕒 **Go Match Timer**
-
+🔗 Live: https://kececibora.github.io/gotimer/
 ### A Modern Tournament Clock for Go / Baduk / Weiqi Players
 
 </div>
