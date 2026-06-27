@@ -1,0 +1,1 @@
+Byo-yomi, Canadian & sudden-death clock for Go, Baduk and Weiqi. No ads.
