@@ -139,7 +139,7 @@ class TimeSystemScreen extends StatelessWidget {
 
                               const SizedBox(height: AppDimens.gap16),
                               Text(
-                                'v.1.1.0',
+                                'v.1.1.1',
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   fontSize: 10,
