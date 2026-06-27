@@ -14,11 +14,22 @@ Bu klasör, `gotimer` uygulamasını Google Play'e **fastlane** ile yüklemek i�
 
 ## 1. Service account (bir kez yapılır)
 
-1. [Google Play Console](https://play.google.com/console) → **Users and permissions** → **Invite new users**
-   yerine API erişimi için: **Setup → API access** (veya Google Cloud Console'da bir proje + service account).
-2. Bir **service account** oluşturun ve **JSON anahtarını** indirin.
-3. Play Console → **API access** → bu service account'a **Release** (yayınlama) yetkisi verin.
-   (Admin / "Release to production, exclude devices, and use Play App Signing" yeterli.)
+> Not: Yeni Play Console arayüzünde "API erişimi" sayfası her zaman görünmez.
+> Aşağıdaki Google Cloud + "Kullanıcılar ve izinler" akışı her durumda çalışır.
+
+**Google Cloud Console'da:**
+1. https://console.cloud.google.com → proje oluşturun/seçin.
+2. **APIs & Services → Library** → "Google Play Android Developer API" → **Enable**.
+3. **IAM & Admin → Service Accounts → Create service account** → isim verin → **Done**.
+4. Oluşan hesap → **Keys → Add key → Create new key → JSON** → indirin.
+   Bu JSON'ın içeriği `GOOGLE_PLAY_JSON_KEY`'dir; dosyayı yerelde
+   `android/fastlane/play-service-account.json` olarak kaydedin (gitignore'lu).
+5. Service account e-postasını kopyalayın (`...@...iam.gserviceaccount.com`).
+
+**Play Console'da:**
+6. **Kullanıcılar ve izinler → Yeni kullanıcı davet et** → bu e-postayı girin.
+7. Uygulama izinlerinde **"Üretime sürüm yayınla"** (+ istenen test track'leri) yetkisini
+   verip davet edin. Birkaç dakika sonra anahtar aktif olur.
 
 Anahtarın geçerli olduğunu doğrulamak için (yerelde):
 
