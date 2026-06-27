@@ -60,7 +60,12 @@ Future<void> goToByoyomiSettings(WidgetTester tester) async {
   expect(find.byIcon(Icons.format_list_numbered_rounded), findsOneWidget);
   expect(find.byIcon(Icons.timer_rounded), findsOneWidget);
 
-  await tester.tap(find.byIcon(Icons.hourglass_bottom_rounded));
+  // Home bir SingleChildScrollView; kucuk test yuzeyinde buton gorunur
+  // alanin disinda kalabilir. Once gorunur yap, sonra tikla (CI uyumu).
+  final byoyomiBtn = find.byIcon(Icons.hourglass_bottom_rounded);
+  await tester.ensureVisible(byoyomiBtn);
+  await tester.pumpAndSettle();
+  await tester.tap(byoyomiBtn);
   await tester.pumpAndSettle();
 
   // Settings ekranında en altta geniş FilledButton var (Start)
@@ -75,6 +80,9 @@ Future<void> startFromByoyomi(WidgetTester tester) async {
   expect(allFilled, findsAtLeastNWidgets(1));
 
   // Settings'teki Start butonu genelde en altta son FilledButton.
+  // Scroll view'in altinda kalabilir; once gorunur yap (CI uyumu).
+  await tester.ensureVisible(allFilled.last);
+  await tester.pumpAndSettle();
   await tester.tap(allFilled.last);
   await tester.pumpAndSettle();
 
