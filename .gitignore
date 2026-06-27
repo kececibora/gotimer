@@ -51,6 +51,9 @@ app.*.map.json
 *.pem
 key.properties
 
+# Ajan calisma notlari/raporlari (yerel kalir, repoya girmez)
+.agent/
+
 # Ham ekran goruntusu yakalamalari (islenmis olanlar metadata altinda)
 store_screenshots/
 
