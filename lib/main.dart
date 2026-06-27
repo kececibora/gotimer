@@ -137,6 +137,18 @@ class TimeSystemScreen extends StatelessWidget {
                                 AppStrings.t(lang, 'simpleDesc'),
                               ),
 
+                              const SizedBox(height: AppDimens.gap16),
+                              Text(
+                                'v.1.1.0',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  color: AppColors.textSecondary.withOpacity(
+                                    0.75,
+                                  ),
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
                               const SizedBox(height: AppDimens.gap24),
                               Row(
                                 mainAxisAlignment:
@@ -596,7 +608,7 @@ class _TimerScreenState extends State<TimerScreen> {
         ? _blackMainTime
         : _blackByoyomiRemaining;
 
-    if (_soundOn && currentPhaseRemaining >= 5 && currentPhaseRemaining <= 10) {
+    if (_soundOn && currentPhaseRemaining >= 1 && currentPhaseRemaining <= 10) {
       _playBeep();
     }
 
@@ -621,10 +633,12 @@ class _TimerScreenState extends State<TimerScreen> {
 
     if (_blackByoyomiRemaining > 0) {
       _blackByoyomiRemaining--;
-    } else if (_blackByoyomiCount > 0) {
+    } else if (_blackByoyomiCount > 1) {
+      // Mevcut periyot doldu → sonraki periyoda geç (hak içinde bulunulan dahil sayılır)
       _blackByoyomiCount--;
       _blackByoyomiRemaining = widget.blackByoyomi;
     } else {
+      // Son periyot da doldu → süre aşımı
       _endGame('settingsWhite');
     }
   }
@@ -634,7 +648,7 @@ class _TimerScreenState extends State<TimerScreen> {
         ? _whiteMainTime
         : _whiteByoyomiRemaining;
 
-    if (_soundOn && currentPhaseRemaining >= 5 && currentPhaseRemaining <= 10) {
+    if (_soundOn && currentPhaseRemaining >= 1 && currentPhaseRemaining <= 10) {
       _playBeep();
     }
 
@@ -659,10 +673,12 @@ class _TimerScreenState extends State<TimerScreen> {
 
     if (_whiteByoyomiRemaining > 0) {
       _whiteByoyomiRemaining--;
-    } else if (_whiteByoyomiCount > 0) {
+    } else if (_whiteByoyomiCount > 1) {
+      // Mevcut periyot doldu → sonraki periyoda geç (hak içinde bulunulan dahil sayılır)
       _whiteByoyomiCount--;
       _whiteByoyomiRemaining = widget.whiteByoyomi;
     } else {
+      // Son periyot da doldu → süre aşımı
       _endGame('settingsBlack');
     }
   }
@@ -683,24 +699,34 @@ class _TimerScreenState extends State<TimerScreen> {
       if (_isBlackTurn) {
         _blackMoves++;
 
-        if (widget.timeSystem == TimeSystemIds.canada && _blackMainTime <= 0) {
-          _blackByoyomiCount--;
+        if (_blackMainTime <= 0) {
+          if (widget.timeSystem == TimeSystemIds.canada) {
+            _blackByoyomiCount--;
 
-          // 🔁 Kanada: hamleler bitince YENİ PERİYOT
-          if (_blackByoyomiCount <= 0) {
-            _blackByoyomiCount = widget.blackByoyomiCount;
+            // 🔁 Kanada: hamleler bitince YENİ PERİYOT
+            if (_blackByoyomiCount <= 0) {
+              _blackByoyomiCount = widget.blackByoyomiCount;
+              _blackByoyomiRemaining = widget.blackByoyomi;
+            }
+          } else if (widget.timeSystem == TimeSystemIds.byoyomi) {
+            // 🔁 Japon byoyomi: hamle zamanında yapıldı → süre tazelenir, hak korunur
             _blackByoyomiRemaining = widget.blackByoyomi;
           }
         }
       } else {
         _whiteMoves++;
 
-        if (widget.timeSystem == TimeSystemIds.canada && _whiteMainTime <= 0) {
-          _whiteByoyomiCount--;
+        if (_whiteMainTime <= 0) {
+          if (widget.timeSystem == TimeSystemIds.canada) {
+            _whiteByoyomiCount--;
 
-          // 🔁 Kanada: hamleler bitince YENİ PERİYOT
-          if (_whiteByoyomiCount <= 0) {
-            _whiteByoyomiCount = widget.whiteByoyomiCount;
+            // 🔁 Kanada: hamleler bitince YENİ PERİYOT
+            if (_whiteByoyomiCount <= 0) {
+              _whiteByoyomiCount = widget.whiteByoyomiCount;
+              _whiteByoyomiRemaining = widget.whiteByoyomi;
+            }
+          } else if (widget.timeSystem == TimeSystemIds.byoyomi) {
+            // 🔁 Japon byoyomi: hamle zamanında yapıldı → süre tazelenir, hak korunur
             _whiteByoyomiRemaining = widget.whiteByoyomi;
           }
         }

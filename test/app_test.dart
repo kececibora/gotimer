@@ -343,9 +343,7 @@ void main() {
       expect(find.textContaining('Moves left: 6 | 10s'), findsOneWidget);
     });
 
-    testWidgets('Son 10-5 saniye araliginda ses mekanigi tetiklenir', (
-      tester,
-    ) async {
+    testWidgets('Geri sayim sesi 10-6 araliginda tetiklenir', (tester) async {
       _setTestScreenSize(tester);
 
       int beepCalls = 0;
@@ -372,12 +370,46 @@ void main() {
       );
 
       await pressPlay(tester);
-      await elapseSeconds(tester, 8);
+      await elapseSeconds(tester, 3); // 12 -> 09, ilk uyari penceresi (<=10)
 
-      // Asset player test ortaminda mock'lanmadigi icin sistem kanalina
-      // sadece fallback sesleri yansiyabilir. En az bir uyarinin tetiklenmesi
-      // (baslangic ve/veya geri sayim) mekanigin calistigini gosterir.
       expect(beepCalls, greaterThanOrEqualTo(1));
+    });
+
+    testWidgets('Geri sayim sesi son saniyelere (5-1) kadar devam eder', (
+      tester,
+    ) async {
+      // Hata #4 regresyonu: eski kod >=5 idi ve son 4 saniye sessizdi.
+      _setTestScreenSize(tester);
+
+      int beepCalls = 0;
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(SystemChannels.platform, (call) async {
+            if (call.method == 'SystemSound.play') beepCalls++;
+            return null;
+          });
+      addTearDown(() {
+        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+            .setMockMethodCallHandler(SystemChannels.platform, null);
+      });
+
+      await pumpTimerScreen(
+        tester,
+        timeSystem: TimeSystemIds.simple,
+        blackMainTime: 4,
+        whiteMainTime: 99,
+        blackByoyomi: 0,
+        whiteByoyomi: 0,
+        blackByoyomiCount: 0,
+        whiteByoyomiCount: 0,
+      );
+
+      await pressPlay(tester);
+      beepCalls = 0; // baslangic beep'ini disla
+
+      // 4 -> 3 -> 2: hepsi <=10 && >=1, ses CALMALI (eski kodda sessizdi)
+      await elapseSeconds(tester, 2);
+
+      expect(beepCalls, greaterThan(0));
     });
 
     testWidgets('Japon Byoyomi: period bitince hak duser ve sure resetlenir', (
@@ -403,6 +435,181 @@ void main() {
       expect(find.text('00:02'), findsOneWidget);
       expect(find.textContaining('Byoyomi: 1 periods | 2s'), findsOneWidget);
       expect(find.byIcon(Icons.pause_rounded), findsOneWidget);
+    });
+
+    testWidgets('Japon Byoyomi: hamle yapilinca sure tazelenir, hak korunur', (
+      tester,
+    ) async {
+      _setTestScreenSize(tester);
+      await pumpTimerScreen(
+        tester,
+        timeSystem: TimeSystemIds.byoyomi,
+        blackMainTime: 0,
+        whiteMainTime: 0,
+        blackByoyomi: 10,
+        whiteByoyomi: 10,
+        blackByoyomiCount: 3,
+        whiteByoyomiCount: 3,
+      );
+
+      await pressPlay(tester);
+
+      // Siyah byoyomi: 00:10 -> 4 saniye harca -> 00:06
+      await elapseSeconds(tester, 4);
+      expect(find.text('00:06'), findsOneWidget);
+
+      // Siyah hamle yapar -> byoyomi suresi 00:10'a tazelenmeli, hak hala 3
+      await tapBlackArea(tester);
+      await tester.pump();
+
+      // 00:06 kaybolur; iki oyuncu da 00:10 gosterir (siyah resetlendi)
+      expect(find.text('00:06'), findsNothing);
+      expect(find.text('00:10'), findsNWidgets(2));
+      // Hak sayisi korunmali (dusmemeli)
+      expect(find.textContaining('Byoyomi: 3 periods | 10s'), findsNWidgets(2));
+    });
+
+    testWidgets('Japon Byoyomi: N hak ayari tam N periyot verir (off-by-one yok)', (
+      tester,
+    ) async {
+      _setTestScreenSize(tester);
+      await pumpTimerScreen(
+        tester,
+        timeSystem: TimeSystemIds.byoyomi,
+        blackMainTime: 0,
+        whiteMainTime: 0,
+        blackByoyomi: 1,
+        whiteByoyomi: 99,
+        blackByoyomiCount: 2,
+        whiteByoyomiCount: 9,
+      );
+
+      await pressPlay(tester);
+
+      // 2 periyot x 1 sn: hamle yapilmazsa 2 periyot sonra (~4 sn) biter.
+      // Eski (hatali) mantik 3 periyot verir ve ~6 sn dayanirdi; 5 sn'de
+      // yeni mantik bitmis, eski mantik hala calisir olurdu.
+      await elapseSeconds(tester, 5);
+
+      // Oyun bitti: kazanan ekrani (settingsWhite) goruntulenir -> pause ikonu yok
+      expect(find.byIcon(Icons.pause_rounded), findsNothing);
+      expect(find.byIcon(Icons.play_arrow_rounded), findsNothing);
+      expect(find.text('White Won!'), findsOneWidget);
+    });
+
+    testWidgets('Hamle sayaci artar ve sira degisir', (tester) async {
+      _setTestScreenSize(tester);
+      await pumpTimerScreen(
+        tester,
+        timeSystem: TimeSystemIds.byoyomi,
+        blackMainTime: 60,
+        whiteMainTime: 60,
+        blackByoyomi: 30,
+        whiteByoyomi: 30,
+        blackByoyomiCount: 5,
+        whiteByoyomiCount: 5,
+      );
+
+      await pressPlay(tester);
+      expect(find.textContaining('Moves: 0'), findsNWidgets(2));
+
+      // Siyah oynar (alt alan): siyah Moves 0 -> 1, sira beyaza gecer
+      await tapBlackArea(tester);
+      await tester.pump();
+      expect(find.textContaining('Moves: 1'), findsOneWidget);
+
+      // Beyaz oynar (ust alan): beyaz Moves 0 -> 1
+      await tapWhiteArea(tester);
+      await tester.pump();
+      expect(find.textContaining('Moves: 1'), findsNWidgets(2));
+    });
+
+    testWidgets('Sira disindaki oyuncunun dokunusu hamleyi gecmez', (
+      tester,
+    ) async {
+      _setTestScreenSize(tester);
+      await pumpTimerScreen(
+        tester,
+        timeSystem: TimeSystemIds.byoyomi,
+        blackMainTime: 60,
+        whiteMainTime: 60,
+        blackByoyomi: 30,
+        whiteByoyomi: 30,
+        blackByoyomiCount: 5,
+        whiteByoyomiCount: 5,
+      );
+
+      await pressPlay(tester);
+
+      // Sira siyahta; beyaz alanina dokunmak hicbir sey yapmamali
+      await tapWhiteArea(tester);
+      await tester.pump();
+      expect(find.textContaining('Moves: 0'), findsNWidgets(2));
+    });
+
+    testWidgets('Basit Zaman: sure bitince oyun biter ve rakip kazanir', (
+      tester,
+    ) async {
+      _setTestScreenSize(tester);
+      await pumpTimerScreen(
+        tester,
+        timeSystem: TimeSystemIds.simple,
+        blackMainTime: 2,
+        whiteMainTime: 60,
+        blackByoyomi: 0,
+        whiteByoyomi: 0,
+        blackByoyomiCount: 0,
+        whiteByoyomiCount: 0,
+      );
+
+      await pressPlay(tester);
+
+      // Siyah 00:02 -> 00:01 -> 00:00 -> 3. tick'te oyun biter
+      await elapseSeconds(tester, 3);
+
+      expect(find.text('White Won!'), findsOneWidget);
+      expect(find.text('Home'), findsOneWidget);
+      expect(find.byIcon(Icons.pause_rounded), findsNothing);
+    });
+
+    testWidgets('Ana sure bitince byoyomi suresine gecilir', (tester) async {
+      _setTestScreenSize(tester);
+      await pumpTimerScreen(
+        tester,
+        timeSystem: TimeSystemIds.byoyomi,
+        blackMainTime: 2,
+        whiteMainTime: 60,
+        blackByoyomi: 30,
+        whiteByoyomi: 30,
+        blackByoyomiCount: 5,
+        whiteByoyomiCount: 5,
+      );
+
+      await pressPlay(tester);
+
+      // main 00:02 -> 00:01 (t1) -> main 0 (t2): ekran byoyomi 00:30'a gecer
+      await elapseSeconds(tester, 2);
+      expect(find.text('00:30'), findsOneWidget);
+    });
+
+    testWidgets('Kanada: blok suresi biterse oyun biter', (tester) async {
+      _setTestScreenSize(tester);
+      await pumpTimerScreen(
+        tester,
+        timeSystem: TimeSystemIds.canada,
+        blackMainTime: 0,
+        whiteMainTime: 60,
+        blackByoyomi: 3,
+        whiteByoyomi: 30,
+        blackByoyomiCount: 5,
+        whiteByoyomiCount: 25,
+      );
+
+      await pressPlay(tester);
+
+      // 3 sn blok, hamle yok: 3->2->1->0, 4. tick'te endGame
+      await elapseSeconds(tester, 5);
+      expect(find.text('White Won!'), findsOneWidget);
     });
   });
 }
