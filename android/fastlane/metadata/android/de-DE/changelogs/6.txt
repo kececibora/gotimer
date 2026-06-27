@@ -1,0 +1,4 @@
+• Japanisches Byo-Yomi korrigiert: Die Zeit wird jetzt nach jedem Zug korrekt zurückgesetzt, mit richtiger Periodenzahl.
+• Der Countdown-Ton läuft jetzt bis in die letzten Sekunden.
+• Der Store-Eintrag ist nun in 10 Sprachen verfügbar.
+• Stabilitätsverbesserungen.

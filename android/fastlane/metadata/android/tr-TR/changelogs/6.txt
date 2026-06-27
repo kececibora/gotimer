@@ -1,0 +1,4 @@
+• Japon byo-yomi düzeltildi: süre artık her hamleden sonra doğru sıfırlanıyor ve hak sayısı doğru.
+• Geri sayım sesi artık son saniyelere kadar çalıyor.
+• Mağaza sayfası artık 10 dilde.
+• Kararlılık iyileştirmeleri.

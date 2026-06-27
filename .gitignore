@@ -51,6 +51,9 @@ app.*.map.json
 *.pem
 key.properties
 
+# Ham ekran goruntusu yakalamalari (islenmis olanlar metadata altinda)
+store_screenshots/
+
 # Fastlane / Google Play (gizli anahtar ASLA commit'lenmez)
 android/fastlane/play-service-account*.json
 **/fastlane/report.xml

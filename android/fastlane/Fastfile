@@ -30,6 +30,43 @@ platform :android do
     UI.success("#{track} track'ine yuklendi ✅")
   end
 
+  desc "pubspec.yaml build numarasini +1 artir (1.1.1+6 -> 1.1.1+7)"
+  lane :bump_build do
+    pubspec = File.join(PROJECT_ROOT, "pubspec.yaml")
+    content = File.read(pubspec)
+    new_content = content.sub(/^version:\s*(\d+\.\d+\.\d+)\+(\d+)\s*$/) do
+      name = Regexp.last_match(1)
+      build = Regexp.last_match(2).to_i + 1
+      UI.message("Surum: #{name}+#{Regexp.last_match(2)} -> #{name}+#{build}")
+      "version: #{name}+#{build}"
+    end
+    UI.user_error!("pubspec.yaml icinde 'version: X.Y.Z+N' bulunamadi") if new_content == content
+    File.write(pubspec, new_content)
+  end
+
+  desc "Build numarasini artir + Play'e yukle. Kullanim: fastlane release track:production"
+  lane :release do |options|
+    bump_build
+    deploy(options)
+  end
+
+  desc "Sadece magaza metni/gorsel/surum notlarini yukle (binary yok)"
+  desc "Kullanim: fastlane metadata version:6"
+  lane :metadata do |options|
+    vc = options[:version] || options[:version_code]
+    upload_to_play_store(
+      track: "production",
+      version_code: vc,
+      skip_upload_apk: true,
+      skip_upload_aab: true,
+      skip_upload_metadata: false,
+      skip_upload_images: false,
+      skip_upload_screenshots: false,
+      skip_upload_changelogs: vc.nil?,
+    )
+    UI.success("Magaza bilgileri yuklendi ✅")
+  end
+
   desc "Sadece kimlik dogrulamayi test et (yukleme yapmaz)"
   lane :validate do
     validate_play_store_json_key

@@ -1,0 +1,4 @@
+• Fixed Japanese byo-yomi: your time now resets correctly after every move, with an accurate period count.
+• The countdown sound now plays through the final seconds.
+• The store listing is now available in 10 languages.
+• Stability improvements.

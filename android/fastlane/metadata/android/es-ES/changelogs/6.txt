@@ -1,0 +1,4 @@
+• Byo-yomi japonés corregido: el tiempo ahora se reinicia correctamente tras cada jugada, con un recuento de periodos exacto.
+• La cuenta atrás suena hasta los últimos segundos.
+• La ficha de la tienda ya está disponible en 10 idiomas.
+• Mejoras de estabilidad.

@@ -1,0 +1,4 @@
+• Byo-yomi giapponese corretto: il tempo ora si azzera correttamente dopo ogni mossa, con un conteggio dei periodi accurato.
+• Il suono del conto alla rovescia ora arriva fino agli ultimi secondi.
+• La scheda dello store è ora disponibile in 10 lingue.
+• Miglioramenti di stabilità.

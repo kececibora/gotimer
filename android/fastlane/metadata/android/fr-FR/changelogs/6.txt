@@ -1,0 +1,4 @@
+• Byo-yomi japonais corrigé : le temps se réinitialise correctement après chaque coup, avec un décompte des périodes exact.
+• Le son du décompte se poursuit jusqu'aux dernières secondes.
+• La fiche du store est désormais disponible en 10 langues.
+• Améliorations de stabilité.

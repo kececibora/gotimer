@@ -49,14 +49,35 @@ GOOGLE_PLAY_JSON_KEY=/tam/yol/play-service-account.json bundle exec fastlane val
 cd android
 bundle install                       # fastlane'i kurar (Gemfile)
 # JSON anahtarini buraya koyun: android/fastlane/play-service-account.json
-bundle exec fastlane deploy track:internal      # internal test track
-# veya
-bundle exec fastlane deploy track:production     # production
+
+bundle exec fastlane release track:internal     # build no'yu +1 yapar, build eder, yukler
+# veya sadece yukle (build no artirmadan):
+bundle exec fastlane deploy  track:production
 ```
 
-`deploy` lane'i otomatik olarak `flutter build appbundle --release` çalıştırır,
-imzalı AAB'yi üretir ve seçilen track'e yükler. `pubspec.yaml`'daki `version`
-(şu an `1.1.1+6`) her yüklemede artırılmalıdır (Play, aynı versionCode'u reddeder).
+Lane'ler:
+- `release track:<t>` — **build numarasini +1 artirir** (1.1.1+6 → 1.1.1+7), sonra
+  `flutter build appbundle --release` yapip yukler. Onerilen yol.
+- `deploy track:<t>` — build numarasini degistirmeden build edip yukler.
+- `bump_build` — sadece pubspec.yaml build numarasini +1 artirir.
+- `metadata version:6` — sadece magaza metni/gorsel/surum notlarini yukler (binary yok).
+- `validate` — service-account anahtarini dogrular.
+
+> Play ayni versionCode'u reddettigi icin her yuklemede build numarasi artmalidir;
+> `release` lane'i bunu otomatik yapar. Surum **adini** (1.1.1 → 1.2.0) yine elle
+> `pubspec.yaml`'dan degistirin (semver karari sizin).
+
+### Magaza gorselleri (ekran goruntuleri)
+Pazarlama ekran goruntuleri uygulamadan otomatik uretilir (iOS simulator):
+```bash
+flutter drive \
+  --driver=test_driver/integration_test.dart \
+  --target=integration_test/screenshot_test.dart \
+  -d <ios-simulator-udid>
+# Ciktilar: store_screenshots/*.png (1170x2532). Play 2:1 sinirina padlenip
+# android/fastlane/metadata/android/en-US/images/phoneScreenshots/ altina konur.
+```
+Sonra `fastlane metadata version:<vc>` ile yuklenir.
 
 ---
 
