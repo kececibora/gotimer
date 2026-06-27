@@ -51,3 +51,12 @@ app.*.map.json
 *.pem
 key.properties
 
+# Fastlane / Google Play (gizli anahtar ASLA commit'lenmez)
+android/fastlane/play-service-account*.json
+**/fastlane/report.xml
+**/fastlane/Preview.html
+**/fastlane/screenshots/**
+**/fastlane/test_output/**
+android/Gemfile.lock
+android/vendor/
+

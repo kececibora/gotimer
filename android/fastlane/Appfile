@@ -1,0 +1,6 @@
+# Google Play service-account JSON anahtari.
+# CI bunu calistirma aninda olusturur; yerelde ise asagidaki yola koyun.
+# Ortam degiskeni ile de gecersiz kilinabilir (GOOGLE_PLAY_JSON_KEY).
+json_key_file(ENV["GOOGLE_PLAY_JSON_KEY"] || "fastlane/play-service-account.json")
+
+package_name("com.borakececi.gotimer")

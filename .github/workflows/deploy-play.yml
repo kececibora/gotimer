@@ -1,0 +1,62 @@
+name: Deploy to Google Play
+
+# Manuel tetikleme (Actions sekmesinden track secerek) veya v* tag push ile calisir.
+on:
+  workflow_dispatch:
+    inputs:
+      track:
+        description: "Google Play track"
+        required: true
+        default: "internal"
+        type: choice
+        options:
+          - internal
+          - alpha
+          - beta
+          - production
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: "stable"
+          flutter-version: "3.38.5"
+
+      - name: Setup Ruby + Bundler (fastlane)
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.1"
+          bundler-cache: true
+          working-directory: android
+
+      - name: Flutter pub get
+        run: flutter pub get
+
+      - name: Decode upload keystore
+        run: echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > android/app/upload-keystore.jks
+
+      - name: Create key.properties
+        run: |
+          cat > android/key.properties <<EOF
+          storePassword=${{ secrets.ANDROID_STORE_PASSWORD }}
+          keyPassword=${{ secrets.ANDROID_KEY_PASSWORD }}
+          keyAlias=${{ secrets.ANDROID_KEY_ALIAS }}
+          storeFile=upload-keystore.jks
+          EOF
+
+      - name: Write Play service-account JSON
+        run: |
+          printf '%s' '${{ secrets.GOOGLE_PLAY_JSON_KEY }}' > android/fastlane/play-service-account.json
+
+      - name: Fastlane deploy
+        working-directory: android
+        run: bundle exec fastlane deploy track:${{ github.event.inputs.track || 'internal' }}

@@ -1,0 +1,38 @@
+default_platform(:android)
+
+# Yollar Fastfile konumuna gore hesaplanir (android/fastlane).
+PROJECT_ROOT = File.expand_path("../..", __dir__)
+AAB_PATH = File.join(PROJECT_ROOT, "build/app/outputs/bundle/release/app-release.aab")
+
+platform :android do
+  desc "Flutter ile imzali release AAB uret"
+  lane :build_aab do
+    Dir.chdir(PROJECT_ROOT) do
+      sh("flutter", "build", "appbundle", "--release")
+    end
+    UI.user_error!("AAB bulunamadi: #{AAB_PATH}") unless File.exist?(AAB_PATH)
+  end
+
+  desc "Google Play'e yukle. Kullanim: fastlane deploy track:internal"
+  desc "track secenekleri: internal | alpha | beta | production (varsayilan: internal)"
+  lane :deploy do |options|
+    track = options[:track] || "internal"
+    build_aab
+    upload_to_play_store(
+      track: track,
+      aab: AAB_PATH,
+      skip_upload_apk: true,
+      skip_upload_metadata: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true,
+      release_status: "completed",
+    )
+    UI.success("#{track} track'ine yuklendi ✅")
+  end
+
+  desc "Sadece kimlik dogrulamayi test et (yukleme yapmaz)"
+  lane :validate do
+    validate_play_store_json_key
+    UI.success("Service-account JSON gecerli ✅")
+  end
+end
