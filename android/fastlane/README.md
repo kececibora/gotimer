@@ -33,6 +33,32 @@ Google Play'e yukle. Kullanim: fastlane deploy track:internal
 
 track secenekleri: internal | alpha | beta | production (varsayilan: internal)
 
+### android bump_build
+
+```sh
+[bundle exec] fastlane android bump_build
+```
+
+pubspec.yaml build numarasini +1 artir (1.1.1+6 -> 1.1.1+7)
+
+### android release
+
+```sh
+[bundle exec] fastlane android release
+```
+
+Build numarasini artir + Play'e yukle. Kullanim: fastlane release track:production
+
+### android metadata
+
+```sh
+[bundle exec] fastlane android metadata
+```
+
+Sadece magaza metni/gorsel/surum notlarini yukle (binary yok)
+
+Kullanim: fastlane metadata version:6
+
 ### android validate
 
 ```sh
