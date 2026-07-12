@@ -17,8 +17,8 @@
 • Üç tema: Klasik, Ahşap Dojo, Cyberpunk
 • Tamamen çevrimdışı çalışır
 
-🌍 10 DİL
-İngilizce, Türkçe, Japonca, Korece, Çince (Basit/Geleneksel), Almanca, Fransızca, İspanyolca, İtalyanca.
+🌍 9 DİL
+İngilizce, Türkçe, Japonca, Korece, Çince (Basitleştirilmiş), Almanca, Fransızca, İspanyolca, İtalyanca.
 
 🔒 GİZLİLİK
 Reklam yok. Hesap yok. İnternet gerekmez. Kişisel veri toplanmaz.

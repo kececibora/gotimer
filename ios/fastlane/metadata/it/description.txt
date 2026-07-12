@@ -1,13 +1,13 @@
-⏱️ L'orologio di gioco pulito e senza distrazioni per il Go, noto anche come Baduk e Weiqi.
+L'orologio di gioco pulito e senza distrazioni per il Go, noto anche come Baduk e Weiqi.
 
 Che sia una partita al circolo, un turno di torneo o un allenamento a casa, il timer mantiene il tempo equo e discreto per farti concentrare sul goban.
 
-▶️ SISTEMI DI TEMPO
+SISTEMI DI TEMPO
 • Byo-yomi giapponese: tempo principale più periodi fissi
 • Byo-yomi canadese: un tempo fisso per un numero di mosse
 • Semplice / Morte improvvisa: un solo tempo principale
 
-✨ FUNZIONI
+FUNZIONI
 • Display grande e leggibile, adatto ai tornei
 • Tocca il tuo lato dello schermo per passare il turno
 • Byo-yomi che si azzera correttamente a ogni mossa
@@ -17,10 +17,10 @@ Che sia una partita al circolo, un turno di torneo o un allenamento a casa, il t
 • Tre temi: Classico, Dojo di Legno, Cyberpunk
 • Funziona completamente offline
 
-🌍 10 LINGUE
-Italiano, inglese, Türkçe, 日本語, 한국어, 简体中文, 繁體中文, Deutsch, Français, Español.
+9 LINGUE
+Italiano, inglese, Türkçe, 日本語, 한국어, 简体中文, Deutsch, Français, Español.
 
-🔒 PRIVACY
+PRIVACY
 Niente pubblicità. Nessun account. Nessuna connessione. Nessun dato personale.
 
 Metti il telefono tra i giocatori, avvia l'orologio e goditi la partita.

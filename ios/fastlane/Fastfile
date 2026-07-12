@@ -1,26 +1,50 @@
 default_platform(:ios)
 
+def asc_api_key
+  # Kimlikler gitignore'lu ios/fastlane/.env dosyasından gelir (public repo!)
+  app_store_connect_api_key(
+    key_id: ENV.fetch("ASC_KEY_ID"),
+    issuer_id: ENV.fetch("ASC_ISSUER_ID"),
+    key_filepath: File.expand_path("AuthKey_#{ENV.fetch('ASC_KEY_ID')}.p8", __dir__)
+  )
+end
+
 platform :ios do
   desc "Apple Distribution sertifikası + App Store profili oluştur/indir"
   lane :certs do
-    api_key = app_store_connect_api_key(
-      key_id: "3MKX9JB4FP",
-      issuer_id: "40910890-fa7c-445d-943a-4344c0120ce8",
-      key_filepath: File.expand_path("AuthKey_3MKX9JB4FP.p8", __dir__)
-    )
+    api_key = asc_api_key
     get_certificates(api_key: api_key)
     get_provisioning_profile(api_key: api_key)
   end
 
+  desc "10 dilli mağaza metinlerini App Store Connect'e yükle"
+  lane :metadata do
+    deliver(
+      api_key: asc_api_key,
+      app_version: "1.1.1",
+      skip_binary_upload: true,
+      skip_screenshots: true,
+      run_precheck_before_submit: false,
+      force: true
+    )
+  end
+
+  desc "Ekran görüntülerini App Store Connect'e yükle"
+  lane :shots do
+    deliver(
+      api_key: asc_api_key,
+      app_version: "1.1.1",
+      skip_binary_upload: true,
+      skip_metadata: true,
+      run_precheck_before_submit: false,
+      force: true
+    )
+  end
+
   desc "Hazır IPA'yı TestFlight'a yükle"
   lane :beta do
-    api_key = app_store_connect_api_key(
-      key_id: "3MKX9JB4FP",
-      issuer_id: "40910890-fa7c-445d-943a-4344c0120ce8",
-      key_filepath: File.expand_path("AuthKey_3MKX9JB4FP.p8", __dir__)
-    )
     upload_to_testflight(
-      api_key: api_key,
+      api_key: asc_api_key,
       ipa: File.expand_path("../../build/ios/ipa/gotimer.ipa", __dir__),
       skip_waiting_for_build_processing: true
     )

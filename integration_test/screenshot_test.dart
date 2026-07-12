@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:gotimer/main.dart';
+import 'package:gotimer/widgets/change_lang_widgets.dart';
 
 // Play Store pazarlama gorselleri uretir.
 // Calistirma:
@@ -38,6 +39,11 @@ void main() {
   }
 
   testWidgets('store screenshots', (tester) async {
+    // Dil, --dart-define=SCREENSHOT_LANG=<kod> ile secilir (uygulama sistem
+    // dilini degil, uygulama ici secimi kullanir).
+    const lang = String.fromEnvironment('SCREENSHOT_LANG', defaultValue: 'en');
+    AppLanguage.set(lang);
+
     // 1) Ana ekran (zaman sistemi secimi)
     await tester.pumpWidget(const GoTimerApp());
     await tester.pumpAndSettle();

@@ -1,13 +1,13 @@
-⏱️ Go (Baduk / Weiqi) oyuncuları için sade, dikkat dağıtmayan bir maç saati.
+Go (Baduk / Weiqi) oyuncuları için sade, dikkat dağıtmayan bir maç saati.
 
 İster kulüp maçı, ister turnuva, ister evde antrenman olsun; Go Baduk Weiqi Sayaç süreyi adil tutar ve sizi tahtaya odaklı bırakır.
 
-▶️ ZAMAN SİSTEMLERİ
+ZAMAN SİSTEMLERİ
 • Japon Byo-yomi — ana süre + belirli sayıda sabit periyot
 • Kanada Byo-yomi — belirli sayıda hamle için sabit süre
 • Basit / Ani Ölüm — tek bir ana süre
 
-✨ ÖZELLİKLER
+ÖZELLİKLER
 • Büyük, turnuvaya uygun, kolay okunan ekran
 • Kendi tarafına dokunarak sırayı devret
 • Her hamlede doğru sıfırlanan byo-yomi (gerçek saat gibi)
@@ -17,10 +17,10 @@
 • Üç tema: Klasik, Ahşap Dojo, Cyberpunk
 • Tamamen çevrimdışı çalışır
 
-🌍 10 DİL
-İngilizce, Türkçe, Japonca, Korece, Çince (Basit/Geleneksel), Almanca, Fransızca, İspanyolca, İtalyanca.
+9 DİL
+İngilizce, Türkçe, Japonca, Korece, Çince (Basitleştirilmiş), Almanca, Fransızca, İspanyolca, İtalyanca.
 
-🔒 GİZLİLİK
+GİZLİLİK
 Reklam yok. Hesap yok. İnternet gerekmez. Kişisel veri toplanmaz.
 
 Telefonu iki oyuncunun arasına koyun, saati başlatın ve oyunun keyfini çıkarın.

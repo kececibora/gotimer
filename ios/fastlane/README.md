@@ -23,6 +23,22 @@ For _fastlane_ installation instructions, see [Installing _fastlane_](https://do
 
 Apple Distribution sertifikası + App Store profili oluştur/indir
 
+### ios metadata
+
+```sh
+[bundle exec] fastlane ios metadata
+```
+
+10 dilli mağaza metinlerini App Store Connect'e yükle
+
+### ios shots
+
+```sh
+[bundle exec] fastlane ios shots
+```
+
+Ekran görüntülerini App Store Connect'e yükle
+
 ### ios beta
 
 ```sh
