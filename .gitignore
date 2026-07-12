@@ -66,3 +66,8 @@ android/fastlane/play-service-account*.json
 android/Gemfile.lock
 android/vendor/
 
+*.p8
+*.p12
+*.cer
+*.certSigningRequest
+*.mobileprovision

@@ -1,0 +1,28 @@
+default_platform(:ios)
+
+platform :ios do
+  desc "Apple Distribution sertifikası + App Store profili oluştur/indir"
+  lane :certs do
+    api_key = app_store_connect_api_key(
+      key_id: "3MKX9JB4FP",
+      issuer_id: "40910890-fa7c-445d-943a-4344c0120ce8",
+      key_filepath: File.expand_path("AuthKey_3MKX9JB4FP.p8", __dir__)
+    )
+    get_certificates(api_key: api_key)
+    get_provisioning_profile(api_key: api_key)
+  end
+
+  desc "Hazır IPA'yı TestFlight'a yükle"
+  lane :beta do
+    api_key = app_store_connect_api_key(
+      key_id: "3MKX9JB4FP",
+      issuer_id: "40910890-fa7c-445d-943a-4344c0120ce8",
+      key_filepath: File.expand_path("AuthKey_3MKX9JB4FP.p8", __dir__)
+    )
+    upload_to_testflight(
+      api_key: api_key,
+      ipa: File.expand_path("../../build/ios/ipa/gotimer.ipa", __dir__),
+      skip_waiting_for_build_processing: true
+    )
+  end
+end

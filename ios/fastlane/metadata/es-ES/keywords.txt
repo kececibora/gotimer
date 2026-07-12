@@ -1,0 +1,1 @@
+byoyomi,igo,goban,reloj de juego,reloj ajedrez,torneo,juego de mesa,estrategia
