@@ -185,8 +185,6 @@ class TimeSystemScreen extends StatelessWidget {
         return isTr ? 'Orijinal' : 'Original';
       case GoThemeId.wood:
         return isTr ? 'Ahsap Uzak Dogu' : 'Wood Dojo';
-      case GoThemeId.cyber:
-        return isTr ? 'Cyberpunk Neon' : 'Cyberpunk Neon';
     }
   }
 
@@ -221,13 +219,6 @@ class TimeSystemScreen extends StatelessWidget {
               label: _themeName(lang, GoThemeId.wood),
               selected: selectedTheme == GoThemeId.wood,
               onTap: () => AppThemeController.setTheme(GoThemeId.wood),
-            ),
-            const SizedBox(width: 8),
-            _themeOptionCard(
-              icon: Icons.bolt_rounded,
-              label: _themeName(lang, GoThemeId.cyber),
-              selected: selectedTheme == GoThemeId.cyber,
-              onTap: () => AppThemeController.setTheme(GoThemeId.cyber),
             ),
           ],
         ),

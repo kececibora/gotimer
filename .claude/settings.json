@@ -4,7 +4,9 @@
       "Bash(flutter analyze)",
       "Bash(flutter analyze *)",
       "Bash(flutter test)",
-      "Bash(flutter test *)"
+      "Bash(flutter test *)",
+      "Bash(/opt/homebrew/opt/ruby/bin/bundle exec fastlane metadata)",
+"Bash(/opt/homebrew/opt/ruby/bin/bundle exec fastlane metadata *)"
     ]
   }
 }

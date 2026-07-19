@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-enum GoThemeId { classic, wood, cyber }
+enum GoThemeId { classic, wood }
 
 class GoThemePalette {
   final Color bg;
@@ -75,22 +75,6 @@ class AppThemeController {
       accent: Color(0xFFDDA154),
       backgroundTint: Color(0xFF7A4A21),
       backgroundTintOpacity: 0.32,
-      backgroundImage1: 'assets/background/background_2.png',
-      backgroundImage2: 'assets/background/background_1.png',
-    ),
-    GoThemeId.cyber: GoThemePalette(
-      bg: Color(0xFF0A0615),
-      card: Color(0xFF18102B),
-      textSecondary: Color(0xFF92FBFF),
-      active: Color(0xFFFF4DA6),
-      blackBase: Color(0xFF080713),
-      whiteBase: Color(0xFFD9FFFE),
-      controlBar: Color(0xFF120B23),
-      controlButton: Color(0xFF30145F),
-      gradientTop: Color(0xB3000010),
-      accent: Color(0xFF00F6FF),
-      backgroundTint: Color(0xFF3D007A),
-      backgroundTintOpacity: 0.35,
       backgroundImage1: 'assets/background/background_2.png',
       backgroundImage2: 'assets/background/background_1.png',
     ),
