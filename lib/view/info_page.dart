@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:gotimer/translate/translate.dart';
 import 'package:gotimer/ui/app_colors.dart';
 import 'package:gotimer/ui/app_dimens.dart';
+import 'package:gotimer/ui/app_text_styles.dart';
+import 'package:gotimer/widgets/fantasy_components.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 Future<void> _launchExternal(String url) async {
@@ -20,18 +22,11 @@ class InfoButton extends StatelessWidget {
       onTap: () => _showInfo(context),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-        decoration: BoxDecoration(
-          color: AppColors.card,
-          borderRadius: BorderRadius.circular(AppDimens.radius20),
-        ),
+        decoration: FantasyDecorations.wood(radius: AppDimens.radius20),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              Icons.info_outline_rounded,
-              size: 32,
-              color: AppColors.textSecondary,
-            ),
+            Icon(Icons.info_outline_rounded, size: 28, color: AppColors.brass),
           ],
         ),
       ),
@@ -42,7 +37,7 @@ class InfoButton extends StatelessWidget {
     showModalBottomSheet(
       context: context,
       useRootNavigator: true, // ✅ en kritik satır
-      backgroundColor: AppColors.card,
+      backgroundColor: AppColors.panelDeep,
       isDismissible: true,
       enableDrag: true,
       isScrollControlled: true,
@@ -67,7 +62,7 @@ class InfoButton extends StatelessWidget {
                           width: 40,
                           height: 4,
                           decoration: BoxDecoration(
-                            color: Colors.white24,
+                            color: AppColors.brass.withValues(alpha: 0.45),
                             borderRadius: BorderRadius.circular(999),
                           ),
                         ),
@@ -82,7 +77,7 @@ class InfoButton extends StatelessWidget {
                       },
                       icon: const Icon(
                         Icons.close_rounded,
-                        color: Colors.white70,
+                        color: Color(0xFFE8DBC2),
                       ),
                     ),
                   ],
@@ -92,11 +87,7 @@ class InfoButton extends StatelessWidget {
 
                 Text(
                   AppStrings.t(languageCode, 'infoTitle'),
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.white,
-                  ),
+                  style: AppTextStyles.infoTitle,
                 ),
                 const SizedBox(height: AppDimens.gap16),
 
@@ -149,16 +140,7 @@ class InfoButton extends StatelessWidget {
               style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
             ),
           if (label.isNotEmpty) const SizedBox(width: AppDimens.gap4),
-          Flexible(
-            child: Text(
-              name,
-              style: const TextStyle(
-                fontSize: 14,
-                color: Colors.white,
-                decoration: TextDecoration.underline,
-              ),
-            ),
-          ),
+          Flexible(child: Text(name, style: AppTextStyles.infoLink)),
           const SizedBox(width: AppDimens.gap4),
           Icon(
             Icons.open_in_new_rounded,

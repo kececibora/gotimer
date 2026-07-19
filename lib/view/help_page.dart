@@ -3,6 +3,8 @@ import 'package:gotimer/translate/translate.dart';
 import 'package:gotimer/widgets/change_lang_widgets.dart'; // AppLanguage.notifier
 import 'package:gotimer/ui/app_colors.dart';
 import 'package:gotimer/ui/app_dimens.dart';
+import 'package:gotimer/ui/app_text_styles.dart';
+import 'package:gotimer/widgets/fantasy_components.dart';
 
 class HelpButton extends StatelessWidget {
   const HelpButton({super.key});
@@ -14,14 +16,11 @@ class HelpButton extends StatelessWidget {
       onTap: () => _showHelp(context),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        decoration: BoxDecoration(
-          color: AppColors.card,
-          borderRadius: BorderRadius.circular(AppDimens.radius20),
-        ),
+        decoration: FantasyDecorations.wood(radius: AppDimens.radius20),
         child: Icon(
           Icons.help_outline_rounded,
-          size: 32,
-          color: AppColors.textSecondary,
+          size: 28,
+          color: AppColors.brass,
         ),
       ),
     );
@@ -34,7 +33,7 @@ class HelpButton extends StatelessWidget {
       isScrollControlled: true,
       isDismissible: true,
       enableDrag: true,
-      backgroundColor: AppColors.card,
+      backgroundColor: AppColors.panelDeep,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(
           top: Radius.circular(AppDimens.radius24),
@@ -56,7 +55,7 @@ class HelpButton extends StatelessWidget {
                         IconButton(
                           icon: const Icon(
                             Icons.close_rounded,
-                            color: Colors.white70,
+                            color: Color(0xFFE8DBC2),
                           ),
                           onPressed: () =>
                               Navigator.of(context, rootNavigator: true).pop(),
@@ -95,11 +94,7 @@ class _HelpTitle extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       AppStrings.t(lang, 'helpTitle'),
-      style: const TextStyle(
-        fontSize: 18,
-        fontWeight: FontWeight.w800,
-        color: Colors.white,
-      ),
+      style: AppTextStyles.display(fontSize: 20),
     );
   }
 }
@@ -114,11 +109,7 @@ class _SectionTitle extends StatelessWidget {
       padding: const EdgeInsets.only(top: 12, bottom: 4),
       child: Text(
         text,
-        style: const TextStyle(
-          fontSize: 15,
-          fontWeight: FontWeight.w700,
-          color: Colors.white,
-        ),
+        style: AppTextStyles.display(fontSize: 15, color: AppColors.brass),
       ),
     );
   }
@@ -134,7 +125,7 @@ class _DragHandle extends StatelessWidget {
         width: 40,
         height: 4,
         decoration: BoxDecoration(
-          color: Colors.white24,
+          color: AppColors.brass.withValues(alpha: 0.45),
           borderRadius: BorderRadius.circular(999),
         ),
       ),
@@ -218,7 +209,7 @@ class _Bullet extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('• ', style: TextStyle(color: Colors.white)),
+          Text('◆ ', style: TextStyle(color: AppColors.brass, fontSize: 10)),
           Expanded(
             child: Text(
               text,

@@ -3,7 +3,7 @@ description: "Go Match Timer — Go/Baduk oyuncuları için tasarlanmış, Byoyo
 
 publish_to: "none"
 
-version: 1.1.1+6
+version: 2.0.0+7
 
 environment:
   sdk: ^3.10.3
@@ -38,8 +38,8 @@ flutter_launcher_icons:
   ios: true
   web:
     generate: true
-    image_path: "assets/icon/app_icon.png"
-  image_path: "assets/icon/app_icon.png"
+    image_path: "assets/icon/app_icon_fantasy_go_wood_v2.png"
+  image_path: "assets/icon/app_icon_fantasy_go_wood_v2.png"
   min_sdk_android: 21
   remove_alpha_ios: true
 
@@ -48,5 +48,13 @@ flutter:
 
   assets:
     - assets/icon/app_icon.png
+    - assets/icon/app_icon_fantasy_go_wood_v2.png
     - assets/background/
+    - assets/textures/
     - assets/sounds/beep.wav
+
+  fonts:
+    - family: Cinzel
+      fonts:
+        - asset: assets/fonts/Cinzel-VariableFont_wght.ttf
+          weight: 800

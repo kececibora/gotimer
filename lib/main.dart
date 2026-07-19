@@ -15,7 +15,9 @@ import 'package:gotimer/widgets/change_lang_widgets.dart';
 
 import 'ui/app_colors.dart';
 import 'ui/app_dimens.dart';
+import 'ui/app_text_styles.dart';
 import 'ui/app_theme.dart';
+import 'widgets/fantasy_components.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -48,300 +50,209 @@ class GoTimerApp extends StatelessWidget {
           title: 'Go Match Timer',
           debugShowCheckedModeBanner: false,
           theme: AppThemeController.buildMaterialTheme(),
-          home: const TimeSystemScreen(),
+          home: const WarmTimeSystemScreen(),
         );
       },
     );
   }
 }
 
-// ============ Time System Selection Screen ============
-class TimeSystemScreen extends StatelessWidget {
-  const TimeSystemScreen({super.key});
+// ============ Warm Dark-Fantasy Time System Selection ============
+class WarmTimeSystemScreen extends StatelessWidget {
+  const WarmTimeSystemScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<GoThemeId>(
-      valueListenable: AppThemeController.notifier,
-      builder: (context, selectedTheme, child) {
-        return ValueListenableBuilder<String>(
-          valueListenable: AppLanguage.notifier,
-          builder: (context, lang, _) {
-            return Scaffold(
-              backgroundColor: AppColors.bg,
-              body: AppBackground(
-                child: Padding(
-                  padding: AppDimens.screenPadding,
-                  child: LayoutBuilder(
-                    builder: (context, constraints) {
-                      return SingleChildScrollView(
-                        child: ConstrainedBox(
-                          constraints: BoxConstraints(
-                            minHeight: constraints.maxHeight,
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: const [LanguageButton()],
-                              ),
-
-                              const SizedBox(height: 50),
-
-                              Text(
-                                AppStrings.t(lang, 'appSubtitle'),
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.w600,
-                                  color: AppColors.textSecondary,
-                                ),
-                              ),
-                              const SizedBox(height: AppDimens.gap12),
-                              Text(
-                                AppStrings.t(lang, 'timeSystemTitle'),
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(
-                                  fontSize: 32,
-                                  fontWeight: FontWeight.w800,
-                                  letterSpacing: 1,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              const SizedBox(height: AppDimens.gap16),
-                              _themeSelector(
-                                lang: lang,
-                                selectedTheme: selectedTheme,
-                              ),
-                              const SizedBox(height: AppDimens.gap20),
-
-                              _timeSystemButton(
-                                context,
-                                TimeSystemIds.byoyomi,
-                                AppStrings.t(lang, 'byoyomiTitle'),
-                                AppStrings.t(lang, 'byoyomiDesc'),
-                              ),
-                              const SizedBox(height: AppDimens.gap16),
-                              _timeSystemButton(
-                                context,
-                                TimeSystemIds.canada,
-                                AppStrings.t(lang, 'canadaTitle'),
-                                AppStrings.t(lang, 'canadaDesc'),
-                              ),
-                              const SizedBox(height: AppDimens.gap16),
-                              _timeSystemButton(
-                                context,
-                                TimeSystemIds.simple,
-                                AppStrings.t(lang, 'simpleTitle'),
-                                AppStrings.t(lang, 'simpleDesc'),
-                              ),
-
-                              const SizedBox(height: AppDimens.gap16),
-                              Text(
-                                'v.1.1.1',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  color: AppColors.textSecondary.withOpacity(
-                                    0.75,
+    return ValueListenableBuilder<String>(
+      valueListenable: AppLanguage.notifier,
+      builder: (context, lang, _) {
+        return Scaffold(
+          backgroundColor: AppColors.menuTop,
+          body: AppBackground(
+            child: Padding(
+              padding: AppDimens.screenPadding,
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  return SingleChildScrollView(
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        minHeight: constraints.maxHeight,
+                      ),
+                      child: IntrinsicHeight(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            const Align(
+                              alignment: Alignment.centerRight,
+                              child: LanguageButton(),
+                            ),
+                            const SizedBox(height: 20),
+                            Center(
+                              child: Container(
+                                width: 82,
+                                height: 82,
+                                padding: const EdgeInsets.all(4),
+                                decoration: BoxDecoration(
+                                  color: AppColors.panelDeep,
+                                  borderRadius: BorderRadius.circular(24),
+                                  border: Border.all(
+                                    color: AppColors.brass.withValues(
+                                      alpha: 0.64,
+                                    ),
                                   ),
-                                  fontWeight: FontWeight.w500,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: AppColors.brass.withValues(
+                                        alpha: 0.2,
+                                      ),
+                                      blurRadius: 24,
+                                      spreadRadius: 1,
+                                    ),
+                                  ],
+                                ),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(19),
+                                  child: Image.asset(
+                                    'assets/icon/app_icon_fantasy_go_wood_v2.png',
+                                    fit: BoxFit.cover,
+                                  ),
                                 ),
                               ),
-                              const SizedBox(height: AppDimens.gap24),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  InfoButton(
-                                    languageCode: lang,
-                                  ), // 👈 SAĞ ALT (Info)
-                                  const HelpButton(), // 👈 SOL ALT (Nasıl Kullanılır)
-                                ],
+                            ),
+                            const SizedBox(height: 18),
+                            Text(
+                              AppStrings.t(lang, 'appSubtitle'),
+                              textAlign: TextAlign.center,
+                              style: AppTextStyles.appSubtitle,
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              AppStrings.t(lang, 'timeSystemTitle'),
+                              textAlign: TextAlign.center,
+                              style: AppTextStyles.screenTitle,
+                            ),
+                            const SizedBox(height: 8),
+                            Center(
+                              child: Container(
+                                width: 72,
+                                height: 2,
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      Colors.transparent,
+                                      AppColors.brass,
+                                      Colors.transparent,
+                                    ],
+                                  ),
+                                ),
                               ),
-                              const SizedBox(height: AppDimens.gap8),
-                            ],
-                          ),
+                            ),
+                            const SizedBox(height: 24),
+                            _systemCard(
+                              context: context,
+                              systemId: TimeSystemIds.byoyomi,
+                              title: AppStrings.t(lang, 'byoyomiTitle'),
+                              description: AppStrings.t(lang, 'byoyomiDesc'),
+                              hint: AppColors.slate,
+                            ),
+                            const SizedBox(height: AppDimens.gap16),
+                            _systemCard(
+                              context: context,
+                              systemId: TimeSystemIds.canada,
+                              title: AppStrings.t(lang, 'canadaTitle'),
+                              description: AppStrings.t(lang, 'canadaDesc'),
+                              hint: AppColors.moss,
+                            ),
+                            const SizedBox(height: AppDimens.gap16),
+                            _systemCard(
+                              context: context,
+                              systemId: TimeSystemIds.simple,
+                              title: AppStrings.t(lang, 'simpleTitle'),
+                              description: AppStrings.t(lang, 'simpleDesc'),
+                              hint: AppColors.brass,
+                            ),
+                            const Spacer(),
+                            const SizedBox(height: AppDimens.gap20),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                InfoButton(languageCode: lang),
+                                Text(
+                                  'v.2.0.0',
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    color: AppColors.textSecondary.withValues(
+                                      alpha: 0.72,
+                                    ),
+                                    fontWeight: FontWeight.w700,
+                                    letterSpacing: 0.8,
+                                  ),
+                                ),
+                                const HelpButton(),
+                              ],
+                            ),
+                            const SizedBox(height: AppDimens.gap8),
+                          ],
                         ),
-                      );
-                    },
-                  ),
-                ),
+                      ),
+                    ),
+                  );
+                },
               ),
-            );
-          },
+            ),
+          ),
         );
       },
     );
   }
 
-  String _themeTitle(String lang) => lang == 'tr' ? 'Tema Seçimi' : 'Theme';
-
-  String _themeName(String lang, GoThemeId theme) {
-    final isTr = lang == 'tr';
-    switch (theme) {
-      case GoThemeId.classic:
-        return isTr ? 'Orijinal' : 'Original';
-      case GoThemeId.wood:
-        return isTr ? 'Ahsap Uzak Dogu' : 'Wood Dojo';
-    }
-  }
-
-  Widget _themeSelector({
-    required String lang,
-    required GoThemeId selectedTheme,
+  Widget _systemCard({
+    required BuildContext context,
+    required String systemId,
+    required String title,
+    required String description,
+    required Color hint,
   }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          _themeTitle(lang),
-          style: TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.w700,
-            color: AppColors.textSecondary,
-            letterSpacing: 0.4,
-          ),
-        ),
-        const SizedBox(height: 10),
-        Row(
-          children: [
-            _themeOptionCard(
-              icon: Icons.layers_rounded,
-              label: _themeName(lang, GoThemeId.classic),
-              selected: selectedTheme == GoThemeId.classic,
-              onTap: () => AppThemeController.setTheme(GoThemeId.classic),
-            ),
-            const SizedBox(width: 8),
-            _themeOptionCard(
-              icon: Icons.temple_buddhist_rounded,
-              label: _themeName(lang, GoThemeId.wood),
-              selected: selectedTheme == GoThemeId.wood,
-              onTap: () => AppThemeController.setTheme(GoThemeId.wood),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _themeOptionCard({
-    required IconData icon,
-    required String label,
-    required bool selected,
-    required VoidCallback onTap,
-  }) {
-    return Expanded(
+    return Material(
+      color: Colors.transparent,
       child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 180),
-          curve: Curves.easeOutCubic,
-          height: 78,
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-          decoration: BoxDecoration(
-            color: selected
-                ? AppColors.controlButton.withOpacity(0.88)
-                : AppColors.card.withOpacity(0.82),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: selected ? AppColors.accent : Colors.white24,
-              width: selected ? 1.4 : 1,
-            ),
-            boxShadow: selected
-                ? [
-                    BoxShadow(
-                      color: AppColors.accent.withOpacity(0.35),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
-                    ),
-                  ]
-                : null,
+        borderRadius: BorderRadius.circular(18),
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => TimerSettingsScreen(timeSystem: systemId),
           ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+        ),
+        child: Ink(
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 17),
+          decoration: FantasyDecorations.panel(accented: true, accent: hint),
+          child: Row(
             children: [
-              Icon(
-                icon,
-                color: selected ? AppColors.accent : Colors.white,
-                size: 20,
+              FantasyIconSurface(
+                icon: _timeSystemIcon(systemId),
+                color: hint,
+                size: 26,
+                padding: const EdgeInsets.all(12),
               ),
-              const SizedBox(height: 6),
-              Text(
-                label,
-                textAlign: TextAlign.center,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.white,
+              const SizedBox(width: AppDimens.gap16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(title, style: AppTextStyles.cardTitle),
+                    const SizedBox(height: 5),
+                    Text(description, style: AppTextStyles.cardDesc),
+                  ],
                 ),
+              ),
+              const SizedBox(width: 8),
+              Icon(
+                Icons.chevron_right_rounded,
+                color: AppColors.brass,
+                size: 24,
               ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _timeSystemButton(
-    BuildContext context,
-    String systemId,
-    String title,
-    String description,
-  ) {
-    return InkWell(
-      borderRadius: BorderRadius.circular(AppDimens.radius24),
-      onTap: () => Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => TimerSettingsScreen(timeSystem: systemId),
-        ),
-      ),
-      child: Ink(
-        decoration: BoxDecoration(
-          color: AppColors.card,
-          borderRadius: BorderRadius.circular(AppDimens.radius24),
-          boxShadow: const [
-            BoxShadow(
-              color: Colors.black26,
-              blurRadius: 18,
-              offset: Offset(0, 8),
-            ),
-          ],
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
-        child: Row(
-          children: [
-            Icon(_timeSystemIcon(systemId), color: Colors.white, size: 32),
-            const SizedBox(width: AppDimens.gap18),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.white,
-                    ),
-                  ),
-                  const SizedBox(height: AppDimens.gap4),
-                  Text(
-                    description,
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: AppColors.textSecondary,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
         ),
       ),
     );
@@ -353,7 +264,6 @@ class TimeSystemScreen extends StatelessWidget {
         return Icons.hourglass_bottom_rounded;
       case TimeSystemIds.canada:
         return Icons.format_list_numbered_rounded;
-      case TimeSystemIds.simple:
       default:
         return Icons.timer_rounded;
     }
@@ -451,24 +361,44 @@ class _TimerScreenState extends State<TimerScreen> {
 
   Widget _buildControlBar() {
     Widget button(IconData icon, VoidCallback onTap) {
-      return InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(AppDimens.gap12),
-        child: Container(
-          width: AppDimens.controlButtonWidth,
-          height: AppDimens.controlButtonHeight,
-          decoration: BoxDecoration(
-            color: AppColors.controlButton,
-            borderRadius: BorderRadius.circular(AppDimens.radius12),
+      return Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(AppDimens.gap12),
+          child: Ink(
+            width: AppDimens.controlButtonWidth,
+            height: AppDimens.controlButtonHeight,
+            decoration: FantasyDecorations.wood(radius: AppDimens.radius12),
+            child: Icon(
+              icon,
+              color:
+                  icon == Icons.play_arrow_rounded ||
+                      icon == Icons.pause_rounded
+                  ? AppColors.brass
+                  : AppColors.parchmentSoft,
+              size: 27,
+            ),
           ),
-          child: Icon(icon, color: Colors.white, size: 28),
         ),
       );
     }
 
     return Container(
       key: ValueKey(_controlsVisible ? 'visible_bar' : 'hidden_bar'),
-      color: AppColors.controlBar,
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [Color(0xFF2B2119), Color(0xFF171411)],
+        ),
+        border: Border.symmetric(
+          horizontal: BorderSide(color: AppColors.hairline),
+        ),
+        boxShadow: [
+          BoxShadow(color: Colors.black.withValues(alpha: 0.5), blurRadius: 16),
+        ],
+      ),
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -765,7 +695,7 @@ class _TimerScreenState extends State<TimerScreen> {
       isScrollControlled: true,
       isDismissible: true,
       enableDrag: true,
-      backgroundColor: AppColors.card,
+      backgroundColor: AppColors.panelDeep,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(
           top: Radius.circular(AppDimens.radius24),
@@ -775,25 +705,22 @@ class _TimerScreenState extends State<TimerScreen> {
         Widget timeTile(String title, int seconds, VoidCallback onTap) {
           return Container(
             margin: const EdgeInsets.symmetric(vertical: 6),
-            decoration: BoxDecoration(
-              color: AppColors.controlBar.withOpacity(0.35),
-              borderRadius: BorderRadius.circular(AppDimens.radius20),
-            ),
+            decoration: FantasyDecorations.panel(),
             child: ListTile(
               onTap: onTap,
               title: Text(
                 title,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w700,
-                  color: Colors.white,
+                  color: AppColors.parchment,
                 ),
               ),
               subtitle: Text(
                 _formatHmsFromSeconds(seconds),
                 style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
               ),
-              trailing: const Icon(Icons.edit_outlined, color: Colors.white70),
+              trailing: Icon(Icons.edit_outlined, color: AppColors.brass),
             ),
           );
         }
@@ -807,10 +734,7 @@ class _TimerScreenState extends State<TimerScreen> {
         ) {
           return Container(
             margin: const EdgeInsets.symmetric(vertical: 6),
-            decoration: BoxDecoration(
-              color: AppColors.controlBar.withOpacity(0.35),
-              borderRadius: BorderRadius.circular(AppDimens.radius20),
-            ),
+            decoration: FantasyDecorations.panel(),
             child: ListTile(
               onTap: () async {
                 final picked = await _showIntPickerLive(
@@ -823,17 +747,17 @@ class _TimerScreenState extends State<TimerScreen> {
               },
               title: Text(
                 title,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w700,
-                  color: Colors.white,
+                  color: AppColors.parchment,
                 ),
               ),
               subtitle: Text(
                 '$value',
                 style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
               ),
-              trailing: const Icon(Icons.edit_outlined, color: Colors.white70),
+              trailing: Icon(Icons.edit_outlined, color: AppColors.brass),
             ),
           );
         }
@@ -860,7 +784,7 @@ class _TimerScreenState extends State<TimerScreen> {
                       width: 46,
                       height: 5,
                       decoration: BoxDecoration(
-                        color: Colors.white24,
+                        color: AppColors.brass.withValues(alpha: 0.45),
                         borderRadius: BorderRadius.circular(999),
                       ),
                     ),
@@ -909,7 +833,7 @@ class _TimerScreenState extends State<TimerScreen> {
                                   backgroundColor: Colors.transparent,
                                   child: Container(
                                     decoration: BoxDecoration(
-                                      color: AppColors.card,
+                                      color: AppColors.panelDeep,
                                       borderRadius: BorderRadius.circular(22),
                                       border: Border.all(
                                         color: Colors.white.withOpacity(0.08),
@@ -1194,8 +1118,8 @@ class _TimerScreenState extends State<TimerScreen> {
                   width: double.infinity,
                   child: FilledButton(
                     style: FilledButton.styleFrom(
-                      backgroundColor: Colors.green,
-                      foregroundColor: Colors.white,
+                      backgroundColor: AppColors.brass,
+                      foregroundColor: AppColors.ink,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(14),
                       ),
@@ -1398,46 +1322,59 @@ class _TimerScreenState extends State<TimerScreen> {
               ? AppStrings.t(lang, 'won')
               : '$winnerName ${AppStrings.t(lang, 'won')}';
 
+          final winnerIsBlack = _winnerKey == 'settingsBlack';
+          final winnerAccent = winnerIsBlack
+              ? AppColors.blackStoneGlow
+              : AppColors.whiteStone;
+
           return Scaffold(
-            body: Container(
-              color: Colors.red,
+            backgroundColor: AppColors.menuTop,
+            body: AppBackground(
               child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      winText,
-                      style: const TextStyle(
-                        fontSize: 60,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                      textAlign: TextAlign.center,
+                child: Padding(
+                  padding: AppDimens.screenPadding,
+                  child: FantasyPanel(
+                    accented: true,
+                    accent: winnerAccent,
+                    padding: const EdgeInsets.fromLTRB(24, 32, 24, 28),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 64,
+                          height: 64,
+                          decoration: FantasyDecorations.chip(
+                            accent: winnerAccent,
+                            radius: 20,
+                          ),
+                          child: Center(
+                            child: _buildStoneMarker(winnerIsBlack, size: 40),
+                          ),
+                        ),
+                        const SizedBox(height: 22),
+                        Text(
+                          winText,
+                          style: AppTextStyles.display(
+                            fontSize: 42,
+                            color: AppColors.parchment,
+                            letterSpacing: 0.8,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 30),
+                        SizedBox(
+                          width: double.infinity,
+                          child: FantasyPrimaryButton(
+                            onPressed: () => Navigator.popUntil(
+                              context,
+                              (route) => route.isFirst,
+                            ),
+                            child: Text(AppStrings.t(lang, 'backToHome')),
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 40),
-                    FilledButton(
-                      style: FilledButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        foregroundColor: Colors.red,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 40,
-                          vertical: 16,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                      ),
-                      onPressed: () =>
-                          Navigator.popUntil(context, (route) => route.isFirst),
-                      child: Text(
-                        AppStrings.t(lang, 'backToHome'),
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               ),
             ),
@@ -1445,6 +1382,7 @@ class _TimerScreenState extends State<TimerScreen> {
         }
 
         return Scaffold(
+          backgroundColor: AppColors.gameBackground,
           body: Column(
             children: [
               Expanded(
@@ -1504,77 +1442,182 @@ class _TimerScreenState extends State<TimerScreen> {
     required int moves,
     required bool isActive,
   }) {
-    final Color backgroundColor = isActive
-        ? AppColors.active
-        : (isBlack ? AppColors.blackBase : AppColors.whiteBase);
-    final Color textColor = isActive
-        ? const Color(0xFF222222)
-        : (isBlack ? Colors.white : const Color(0xFF111111));
-
+    final glow = isBlack ? AppColors.blackStoneGlow : AppColors.whiteStoneGlow;
+    final textColor = isBlack ? AppColors.parchment : AppColors.ink;
+    final chipBackground = isBlack
+        ? AppColors.parchment.withValues(alpha: 0.07)
+        : AppColors.ink.withValues(alpha: 0.08);
+    final chipBorder = isBlack
+        ? AppColors.whiteStone.withValues(alpha: 0.22)
+        : AppColors.ink.withValues(alpha: 0.28);
+    final playerLabel = AppStrings.t(
+      lang,
+      isBlack ? 'settingsBlack' : 'settingsWhite',
+    );
     final currentDisplayTime = mainTime > 0 ? mainTime : byoyomiRemaining;
 
-    // ✅ DİNAMİK BYOYOMI BİLGİSİ (kalan hak + kalan süre)
     String byoyomiInfo = '';
-
     if (!_isSimple && byoyomiCount > 0) {
       final fixedSec = isBlack ? widget.blackByoyomi : widget.whiteByoyomi;
       if (widget.timeSystem == TimeSystemIds.byoyomi) {
-        final template = AppStrings.t(lang, 'timerJapanInfo');
-        byoyomiInfo = template
+        byoyomiInfo = AppStrings.t(lang, 'timerJapanInfo')
             .replaceFirst('{count}', '$byoyomiCount')
             .replaceFirst('{seconds}', '$fixedSec');
       } else if (widget.timeSystem == TimeSystemIds.canada) {
-        final template = AppStrings.t(lang, 'timerCanadaInfo');
-        byoyomiInfo = template
+        byoyomiInfo = AppStrings.t(lang, 'timerCanadaInfo')
             .replaceFirst('{count}', '$byoyomiCount')
             .replaceFirst('{seconds}', '$fixedSec');
       }
     }
 
     final movesLabel = AppStrings.t(lang, 'moves');
-
-    Widget content = Container(
-      color: backgroundColor,
+    Widget content = AnimatedContainer(
+      duration: const Duration(milliseconds: 220),
+      curve: Curves.easeOutCubic,
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-      child: SafeArea(
-        top: isTop,
-        bottom: !isTop,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Align(
-              alignment: Alignment.topRight,
-              child: Text(
-                '$movesLabel: $moves',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: textColor.withOpacity(0.8),
-                ),
-              ),
-            ),
-            const SizedBox(height: AppDimens.gap8),
-            Text(
-              _formatTime(currentDisplayTime),
-              style: TextStyle(
-                fontSize: 80,
-                fontWeight: FontWeight.w800,
-                letterSpacing: 2,
-                color: textColor,
-              ),
-            ),
-            if (byoyomiInfo.isNotEmpty) ...[
-              const SizedBox(height: AppDimens.gap8),
-              Text(
-                byoyomiInfo,
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                  color: textColor.withOpacity(0.9),
-                ),
-              ),
-            ],
-          ],
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: isBlack
+              ? const [Color(0xFF0C0C0B), Color(0xFF1B1815), Color(0xFF2A2118)]
+              : const [Color(0xFFE5DAC3), Color(0xFFC0B08F), Color(0xFF83735A)],
+          stops: const [0, 0.58, 1],
         ),
+        border: Border.all(color: isActive ? glow : chipBorder, width: 2),
+        boxShadow: isActive
+            ? [
+                BoxShadow(
+                  color: glow.withValues(alpha: 0.34),
+                  blurRadius: 30,
+                  spreadRadius: 2,
+                  blurStyle: BlurStyle.inner,
+                ),
+              ]
+            : null,
+      ),
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          Opacity(
+            opacity: isBlack ? 0.1 : 0.07,
+            child: Image.asset(
+              'assets/textures/dark_tabletop.png',
+              fit: BoxFit.cover,
+            ),
+          ),
+          SafeArea(
+            top: isTop,
+            bottom: !isTop,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: chipBackground,
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: chipBorder),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          _buildStoneMarker(isBlack),
+                          const SizedBox(width: 7),
+                          Text(
+                            playerLabel,
+                            style: TextStyle(
+                              fontWeight: FontWeight.w800,
+                              fontSize: 12,
+                              color: textColor,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: chipBackground,
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: chipBorder),
+                      ),
+                      child: Text(
+                        '$movesLabel: $moves',
+                        style: AppTextStyles.moveCount.copyWith(
+                          color: textColor,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 14),
+                Text(
+                  _formatTime(currentDisplayTime),
+                  style: AppTextStyles.timerBig.copyWith(
+                    color: textColor,
+                    shadows: isActive
+                        ? [
+                            Shadow(
+                              color: glow.withValues(alpha: 0.72),
+                              blurRadius: 18,
+                            ),
+                          ]
+                        : null,
+                  ),
+                ),
+                if (byoyomiInfo.isNotEmpty) ...[
+                  const SizedBox(height: AppDimens.gap8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 7,
+                    ),
+                    decoration: BoxDecoration(
+                      color: chipBackground,
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(color: chipBorder),
+                    ),
+                    child: Text(
+                      byoyomiInfo,
+                      style: AppTextStyles.byoInfo.copyWith(color: textColor),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ],
+                const SizedBox(height: 14),
+                AnimatedOpacity(
+                  duration: const Duration(milliseconds: 220),
+                  curve: Curves.easeOutCubic,
+                  opacity: isActive ? 1 : 0,
+                  child: Container(
+                    width: 46,
+                    height: 3,
+                    decoration: BoxDecoration(
+                      color: glow,
+                      borderRadius: BorderRadius.circular(99),
+                      boxShadow: [
+                        BoxShadow(
+                          color: glow.withValues(alpha: 0.72),
+                          blurRadius: 10,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
 
@@ -1583,6 +1626,36 @@ class _TimerScreenState extends State<TimerScreen> {
     }
 
     return content;
+  }
+
+  Widget _buildStoneMarker(bool isBlack, {double size = 17}) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        gradient: RadialGradient(
+          center: const Alignment(-0.35, -0.4),
+          radius: 0.92,
+          colors: isBlack
+              ? const [Color(0xFF77736C), Color(0xFF242321), Color(0xFF050505)]
+              : const [Color(0xFFFFFFFF), Color(0xFFEDE4D2), Color(0xFFBCAE91)],
+          stops: const [0, 0.34, 1],
+        ),
+        border: Border.all(
+          color: isBlack
+              ? AppColors.whiteStone.withValues(alpha: 0.18)
+              : AppColors.ink.withValues(alpha: 0.22),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.42),
+            blurRadius: size * 0.28,
+            offset: Offset(0, size * 0.12),
+          ),
+        ],
+      ),
+    );
   }
 
   String _formatTime(int seconds) {
@@ -1657,30 +1730,42 @@ class _TimerSettingsScreenState extends State<TimerSettingsScreen> {
               padding: AppDimens.screenPadding,
               child: Column(
                 children: [
-                  SwitchListTile(
-                    value: _useDifferentSettings,
-                    onChanged: (val) {
-                      setState(() {
-                        _useDifferentSettings = val;
-                        if (val) {
-                          _whiteMainH = _blackMainH;
-                          _whiteMainM = _blackMainM;
-                          _whiteMainS = _blackMainS;
+                  FantasyPanel(
+                    accented: true,
+                    padding: EdgeInsets.zero,
+                    child: SwitchListTile(
+                      value: _useDifferentSettings,
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 3,
+                      ),
+                      onChanged: (val) {
+                        setState(() {
+                          _useDifferentSettings = val;
+                          if (val) {
+                            _whiteMainH = _blackMainH;
+                            _whiteMainM = _blackMainM;
+                            _whiteMainS = _blackMainS;
 
-                          _whiteByoH = _blackByoH;
-                          _whiteByoM = _blackByoM;
-                          _whiteByoS = _blackByoS;
+                            _whiteByoH = _blackByoH;
+                            _whiteByoM = _blackByoM;
+                            _whiteByoS = _blackByoS;
 
-                          _whiteByoCount = _blackByoCount;
-                        }
-                      });
-                    },
-                    title: Text(
-                      AppStrings.t(lang, 'settingsDifferent'),
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 15,
-                        color: Colors.white70,
+                            _whiteByoCount = _blackByoCount;
+                          }
+                        });
+                      },
+                      secondary: Icon(
+                        Icons.tune_rounded,
+                        color: AppColors.brass,
+                      ),
+                      title: Text(
+                        AppStrings.t(lang, 'settingsDifferent'),
+                        style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 15,
+                          color: AppColors.parchmentSoft,
+                        ),
                       ),
                     ),
                   ),
@@ -1692,26 +1777,9 @@ class _TimerSettingsScreenState extends State<TimerSettingsScreen> {
                   const SizedBox(height: AppDimens.gap32),
                   SizedBox(
                     width: double.infinity,
-                    child: FilledButton(
-                      style: FilledButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 50,
-                          vertical: 16,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                        backgroundColor: Colors.green,
-                        foregroundColor: Colors.white,
-                      ),
+                    child: FantasyPrimaryButton(
                       onPressed: _onStartPressed,
-                      child: Text(
-                        AppStrings.t(lang, 'btnStart'),
-                        style: const TextStyle(
-                          fontSize: 17,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
+                      child: Text(AppStrings.t(lang, 'btnStart')),
                     ),
                   ),
                 ],
@@ -1741,7 +1809,10 @@ class _TimerSettingsScreenState extends State<TimerSettingsScreen> {
       children: [
         Text(
           AppStrings.t(lang, 'settingsBlack'),
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+          style: AppTextStyles.display(
+            fontSize: 18,
+            color: AppColors.blackStoneGlow,
+          ),
         ),
         const SizedBox(height: AppDimens.gap8),
         _buildPlayerBlock(
@@ -1753,6 +1824,7 @@ class _TimerSettingsScreenState extends State<TimerSettingsScreen> {
           byoM: _blackByoM,
           byoS: _blackByoS,
           byoCount: _blackByoCount,
+          accent: AppColors.blackStoneGlow,
           onMainChanged: (h, m, s) => setState(() {
             _blackMainH = h;
             _blackMainM = m;
@@ -1768,7 +1840,10 @@ class _TimerSettingsScreenState extends State<TimerSettingsScreen> {
         const SizedBox(height: AppDimens.gap24),
         Text(
           AppStrings.t(lang, 'settingsWhite'),
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+          style: AppTextStyles.display(
+            fontSize: 18,
+            color: AppColors.whiteStone,
+          ),
         ),
         const SizedBox(height: AppDimens.gap8),
         _buildPlayerBlock(
@@ -1780,6 +1855,7 @@ class _TimerSettingsScreenState extends State<TimerSettingsScreen> {
           byoM: _whiteByoM,
           byoS: _whiteByoS,
           byoCount: _whiteByoCount,
+          accent: AppColors.whiteStone,
           onMainChanged: (h, m, s) => setState(() {
             _whiteMainH = h;
             _whiteMainM = m;
@@ -1806,6 +1882,7 @@ class _TimerSettingsScreenState extends State<TimerSettingsScreen> {
       byoM: _blackByoM,
       byoS: _blackByoS,
       byoCount: _blackByoCount,
+      accent: AppColors.brass,
       onMainChanged: (h, m, s) => setState(() {
         _blackMainH = h;
         _blackMainM = m;
@@ -1829,6 +1906,7 @@ class _TimerSettingsScreenState extends State<TimerSettingsScreen> {
     required int byoM,
     required int byoS,
     required int byoCount,
+    required Color accent,
     required void Function(int, int, int) onMainChanged,
     required void Function(int, int, int) onByoChanged,
     required void Function(int) onCountChanged,
@@ -1843,6 +1921,7 @@ class _TimerSettingsScreenState extends State<TimerSettingsScreen> {
         _buildTimeTile(
           label: mainLabel,
           subtitle: _formatHms(mainH, mainM, mainS),
+          accent: accent,
           onTap: () async {
             final result = await _showTimePicker(
               context: context,
@@ -1860,6 +1939,7 @@ class _TimerSettingsScreenState extends State<TimerSettingsScreen> {
               _buildTimeTile(
                 label: byoyomiLabel,
                 subtitle: _formatHms(byoH, byoM, byoS),
+                accent: accent,
                 onTap: () async {
                   final result = await _showTimePicker(
                     context: context,
@@ -1877,6 +1957,7 @@ class _TimerSettingsScreenState extends State<TimerSettingsScreen> {
                 _buildIntTile(
                   label: _isCanada ? canadaLabel : japanLabel,
                   value: byoCount,
+                  accent: accent,
                   onTap: () async {
                     final value = await _showIntPicker(
                       context: context,
@@ -1936,23 +2017,21 @@ class _TimerSettingsScreenState extends State<TimerSettingsScreen> {
   Widget _buildTimeTile({
     required String label,
     required String subtitle,
+    required Color accent,
     required VoidCallback onTap,
   }) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 6),
-      decoration: BoxDecoration(
-        color: AppColors.card,
-        borderRadius: BorderRadius.circular(AppDimens.radius20),
-      ),
+      decoration: FantasyDecorations.panel(accented: true, accent: accent),
       child: ListTile(
         onTap: onTap,
         contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
         title: Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 15,
-            fontWeight: FontWeight.w600,
-            color: Colors.white,
+            fontWeight: FontWeight.w700,
+            color: AppColors.parchment,
           ),
         ),
         subtitle: Text(
@@ -1961,15 +2040,8 @@ class _TimerSettingsScreenState extends State<TimerSettingsScreen> {
         ),
         trailing: Container(
           padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.08),
-            borderRadius: BorderRadius.circular(AppDimens.radius12),
-          ),
-          child: const Icon(
-            Icons.mode_edit_outline_rounded,
-            size: 20,
-            color: Colors.white,
-          ),
+          decoration: FantasyDecorations.chip(accent: accent, radius: 12),
+          child: Icon(Icons.mode_edit_outline_rounded, size: 20, color: accent),
         ),
       ),
     );
@@ -1978,23 +2050,21 @@ class _TimerSettingsScreenState extends State<TimerSettingsScreen> {
   Widget _buildIntTile({
     required String label,
     required int value,
+    required Color accent,
     required VoidCallback onTap,
   }) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 6),
-      decoration: BoxDecoration(
-        color: AppColors.card,
-        borderRadius: BorderRadius.circular(AppDimens.radius20),
-      ),
+      decoration: FantasyDecorations.panel(accented: true, accent: accent),
       child: ListTile(
         onTap: onTap,
         contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
         title: Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 15,
-            fontWeight: FontWeight.w600,
-            color: Colors.white,
+            fontWeight: FontWeight.w700,
+            color: AppColors.parchment,
           ),
         ),
         subtitle: Text(
@@ -2003,11 +2073,8 @@ class _TimerSettingsScreenState extends State<TimerSettingsScreen> {
         ),
         trailing: Container(
           padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.08),
-            borderRadius: BorderRadius.circular(AppDimens.radius12),
-          ),
-          child: const Icon(Icons.edit_outlined, size: 20, color: Colors.white),
+          decoration: FantasyDecorations.chip(accent: accent, radius: 12),
+          child: Icon(Icons.edit_outlined, size: 20, color: accent),
         ),
       ),
     );

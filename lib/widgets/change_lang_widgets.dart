@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:gotimer/translate/translate.dart';
 import 'package:gotimer/ui/app_colors.dart';
 import 'package:gotimer/ui/app_dimens.dart';
+import 'package:gotimer/widgets/fantasy_components.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AppLanguage {
@@ -77,14 +78,11 @@ class LanguageButton extends StatelessWidget {
       valueListenable: AppLanguage.notifier,
       builder: (context, lang, _) {
         return Container(
-          decoration: BoxDecoration(
-            color: AppColors.card,
-            borderRadius: BorderRadius.circular(AppDimens.gap20),
-          ),
+          decoration: FantasyDecorations.wood(radius: AppDimens.gap20),
           child: PopupMenuButton<String>(
             initialValue: lang,
             offset: const Offset(0, 40),
-            color: AppColors.card,
+            color: AppColors.panelDeep,
             onSelected: (code) => AppLanguage.set(code),
             itemBuilder: (context) {
               return AppStrings.supportedLanguages.map((code) {
@@ -92,7 +90,10 @@ class LanguageButton extends StatelessWidget {
                   value: code,
                   child: Text(
                     _label(code),
-                    style: const TextStyle(color: Colors.white),
+                    style: TextStyle(
+                      color: AppColors.parchmentSoft,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 );
               }).toList();
@@ -104,17 +105,17 @@ class LanguageButton extends StatelessWidget {
                 children: [
                   Text(
                     _label(lang),
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: AppColors.parchment,
                       fontSize: 14,
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
                   const SizedBox(width: AppDimens.gap4),
-                  const Icon(
+                  Icon(
                     Icons.language_rounded,
-                    size: 32,
-                    color: Colors.white,
+                    size: 26,
+                    color: AppColors.brass,
                   ),
                 ],
               ),
