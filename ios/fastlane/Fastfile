@@ -44,9 +44,24 @@ platform :ios do
 
   desc "Hazır IPA'yı TestFlight'a yükle"
   lane :beta do
+    ipa = File.expand_path("../../build/ios/ipa/gotimer.ipa", __dir__)
+
+    # Koruma: flutter drive sonrası Generated.xcconfig test hedefinde kalabilir;
+    # test koduyla derlenmiş IPA'yı ASLA yükleme (2.0.0+7 kazası).
+    Dir.mktmpdir do |tmp|
+      sh("unzip -o -q #{ipa.shellescape} 'Payload/Runner.app/Frameworks/App.framework/App' -d #{tmp.shellescape}")
+      hits = sh(
+        "strings #{tmp.shellescape}/Payload/Runner.app/Frameworks/App.framework/App | " \
+        "grep -cE 'screenshot_test|IntegrationTestWidgetsFlutterBinding' || true",
+        log: false
+      ).strip.to_i
+      UI.user_error!("IPA test koduyla derlenmiş (#{hits} iz)! 'flutter build ipa' ile yeniden derle.") if hits > 0
+      UI.success("IPA temiz: test kodu izi yok ✓")
+    end
+
     upload_to_testflight(
       api_key: asc_api_key,
-      ipa: File.expand_path("../../build/ios/ipa/gotimer.ipa", __dir__),
+      ipa: ipa,
       skip_waiting_for_build_processing: true
     )
   end
