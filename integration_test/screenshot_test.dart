@@ -104,6 +104,21 @@ void main() {
       '05_simple_running',
     );
 
+    // 6) Fischer - calisan saat (increment bilgisi gorunur)
+    await shootRunningTimer(
+      tester,
+      const TimerScreen(
+        timeSystem: TimeSystemIds.fischer,
+        blackMainTime: 305,
+        whiteMainTime: 612,
+        blackByoyomi: 5, // +5 sn / hamle
+        whiteByoyomi: 5,
+        blackByoyomiCount: 0,
+        whiteByoyomiCount: 0,
+      ),
+      '06_fischer_running',
+    );
+
     // Son ekranin timer'ini durdur (pending timer hatasini onler).
     await teardown(tester);
   });

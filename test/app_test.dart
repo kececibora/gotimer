@@ -203,13 +203,14 @@ void main() {
   });
 
   group('🟢 Go Match Timer – Universal Flow Tests', () {
-    testWidgets('Home yükleniyor (3 time system kartı var)', (tester) async {
+    testWidgets('Home yükleniyor (4 time system kartı var)', (tester) async {
       _setTestScreenSize(tester);
       await pumpApp(tester);
 
       expect(find.byIcon(Icons.hourglass_bottom_rounded), findsOneWidget);
       expect(find.byIcon(Icons.format_list_numbered_rounded), findsOneWidget);
       expect(find.byIcon(Icons.timer_rounded), findsOneWidget);
+      expect(find.byIcon(Icons.add_alarm_rounded), findsOneWidget);
     });
 
     testWidgets('Byoyomi settings açılıyor', (tester) async {
@@ -618,6 +619,107 @@ void main() {
       // 3 sn blok, hamle yok: 3->2->1->0, 4. tick'te endGame
       await elapseSeconds(tester, 5);
       expect(find.text('White Won!'), findsOneWidget);
+    });
+  });
+
+  group('⏱️ Fischer (increment) Testleri', () {
+    testWidgets('Fischer: hamlede ana süreye increment eklenir', (
+      tester,
+    ) async {
+      _setTestScreenSize(tester);
+      await pumpTimerScreen(
+        tester,
+        timeSystem: TimeSystemIds.fischer,
+        blackMainTime: 60,
+        whiteMainTime: 60,
+        blackByoyomi: 10, // increment = 10 sn
+        whiteByoyomi: 10,
+        blackByoyomiCount: 0,
+        whiteByoyomiCount: 0,
+      );
+
+      await pressPlay(tester);
+
+      // Siyah 5 sn harcar: 00:60 -> 00:55
+      await elapseSeconds(tester, 5);
+      expect(find.text('00:55'), findsOneWidget);
+
+      // Siyah hamle yapar: 55 + 10 increment = 65 -> 01:05, sıra beyaza geçer
+      await tapBlackArea(tester);
+      await tester.pump();
+      expect(find.text('01:05'), findsOneWidget);
+    });
+
+    testWidgets('Fischer: increment 1. hamleden itibaren geçerli', (
+      tester,
+    ) async {
+      _setTestScreenSize(tester);
+      await pumpTimerScreen(
+        tester,
+        timeSystem: TimeSystemIds.fischer,
+        blackMainTime: 30,
+        whiteMainTime: 30,
+        blackByoyomi: 5,
+        whiteByoyomi: 5,
+        blackByoyomiCount: 0,
+        whiteByoyomiCount: 0,
+      );
+
+      await pressPlay(tester);
+
+      // İlk hamle hemen yapılır (süre harcamadan): 30 + 5 = 35 -> 00:35
+      await tapBlackArea(tester);
+      await tester.pump();
+      expect(find.text('00:35'), findsOneWidget);
+    });
+
+    testWidgets('Fischer: ana süre biterse oyun biter', (tester) async {
+      _setTestScreenSize(tester);
+      await pumpTimerScreen(
+        tester,
+        timeSystem: TimeSystemIds.fischer,
+        blackMainTime: 2,
+        whiteMainTime: 60,
+        blackByoyomi: 10,
+        whiteByoyomi: 10,
+        blackByoyomiCount: 0,
+        whiteByoyomiCount: 0,
+      );
+
+      await pressPlay(tester);
+
+      // Hamle yapılmazsa increment eklenmez: 2 -> 1 -> 0 -> 3. tick oyun biter
+      await elapseSeconds(tester, 3);
+      expect(find.text('White Won!'), findsOneWidget);
+      expect(find.byIcon(Icons.pause_rounded), findsNothing);
+    });
+
+    testWidgets('Fischer: hızlı hamlelerde süre birikir (sınırsız)', (
+      tester,
+    ) async {
+      _setTestScreenSize(tester);
+      await pumpTimerScreen(
+        tester,
+        timeSystem: TimeSystemIds.fischer,
+        blackMainTime: 20,
+        whiteMainTime: 20,
+        blackByoyomi: 10,
+        whiteByoyomi: 10,
+        blackByoyomiCount: 0,
+        whiteByoyomiCount: 0,
+      );
+
+      await pressPlay(tester);
+
+      // Siyah hemen oynar: 20 + 10 = 30 (başlangıçtan yüksek) -> 00:30
+      await tapBlackArea(tester); // sıra beyaza
+      await tester.pump();
+      await tapWhiteArea(tester); // beyaz oynar, sıra siyaha
+      await tester.pump();
+      // Siyah tekrar hemen oynar: 30 + 10 = 40 -> 00:40
+      await tapBlackArea(tester);
+      await tester.pump();
+      expect(find.text('00:40'), findsOneWidget);
     });
   });
 }

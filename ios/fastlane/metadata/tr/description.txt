@@ -6,6 +6,7 @@ ZAMAN SİSTEMLERİ
 • Japon Byo-yomi — ana süre + belirli sayıda sabit periyot
 • Kanada Byo-yomi — belirli sayıda hamle için sabit süre
 • Basit / Ani Ölüm — tek bir ana süre
+• Fischer — her hamleden sonra saate sabit ek süre eklenir
 
 ÖZELLİKLER
 • Büyük, turnuvaya uygun, kolay okunan ekran

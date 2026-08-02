@@ -6,6 +6,7 @@ SISTEMI DI TEMPO
 • Byo-yomi giapponese: tempo principale più periodi fissi
 • Byo-yomi canadese: un tempo fisso per un numero di mosse
 • Semplice / Morte improvvisa: un solo tempo principale
+• Fischer — un incremento fisso dopo ogni mossa
 
 FUNZIONI
 • Display grande e leggibile, adatto ai tornei

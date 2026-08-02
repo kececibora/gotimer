@@ -6,6 +6,7 @@ Ob Vereinspartie, Turnierrunde oder Training zu Hause: Go Baduk Weiqi Timer häl
 • Japanisches Byo-Yomi – Grundzeit plus feste Perioden
 • Kanadisches Byo-Yomi – feste Zeit für eine Anzahl Züge
 • Einfach / Sudden Death – nur Grundzeit
+• Fischer — nach jedem Zug wird eine feste Zeit gutgeschrieben
 
 ✨ FUNKTIONEN
 • Große, gut lesbare Turnieranzeige

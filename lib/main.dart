@@ -34,6 +34,7 @@ class TimeSystemIds {
   static const byoyomi = 'byoyomi';
   static const canada = 'canada';
   static const simple = 'simple';
+  static const fischer = 'fischer';
 }
 
 // ================== APP ==================
@@ -171,6 +172,14 @@ class WarmTimeSystemScreen extends StatelessWidget {
                               description: AppStrings.t(lang, 'simpleDesc'),
                               hint: AppColors.brass,
                             ),
+                            const SizedBox(height: AppDimens.gap16),
+                            _systemCard(
+                              context: context,
+                              systemId: TimeSystemIds.fischer,
+                              title: AppStrings.t(lang, 'fischerTitle'),
+                              description: AppStrings.t(lang, 'fischerDesc'),
+                              hint: AppColors.slate,
+                            ),
                             const Spacer(),
                             const SizedBox(height: AppDimens.gap20),
                             Row(
@@ -178,7 +187,7 @@ class WarmTimeSystemScreen extends StatelessWidget {
                               children: [
                                 InfoButton(languageCode: lang),
                                 Text(
-                                  'v.2.0.1',
+                                  'v.2.1.0',
                                   style: TextStyle(
                                     fontSize: 10,
                                     color: AppColors.textSecondary.withValues(
@@ -264,6 +273,8 @@ class WarmTimeSystemScreen extends StatelessWidget {
         return Icons.hourglass_bottom_rounded;
       case TimeSystemIds.canada:
         return Icons.format_list_numbered_rounded;
+      case TimeSystemIds.fischer:
+        return Icons.add_alarm_rounded;
       default:
         return Icons.timer_rounded;
     }
@@ -322,6 +333,7 @@ class _TimerScreenState extends State<TimerScreen> {
 
   bool _soundOn = true;
   bool get _isSimple => widget.timeSystem == TimeSystemIds.simple;
+  bool get _isFischer => widget.timeSystem == TimeSystemIds.fischer;
 
   @override
   void initState() {
@@ -538,7 +550,8 @@ class _TimerScreenState extends State<TimerScreen> {
       return;
     }
 
-    if (_isSimple) {
+    // Fischer'da (Basit gibi) ana süre biterse oyun biter; ayrı periyot yok.
+    if (_isSimple || _isFischer) {
       _endGame('settingsWhite');
       return;
     }
@@ -578,7 +591,8 @@ class _TimerScreenState extends State<TimerScreen> {
       return;
     }
 
-    if (_isSimple) {
+    // Fischer'da (Basit gibi) ana süre biterse oyun biter; ayrı periyot yok.
+    if (_isSimple || _isFischer) {
       _endGame('settingsBlack');
       return;
     }
@@ -620,7 +634,10 @@ class _TimerScreenState extends State<TimerScreen> {
       if (_isBlackTurn) {
         _blackMoves++;
 
-        if (_blackMainTime <= 0) {
+        if (_isFischer) {
+          // 🔁 Fischer: her hamlede ana süreye sabit ek süre eklenir (sınırsız)
+          _blackMainTime += widget.blackByoyomi;
+        } else if (_blackMainTime <= 0) {
           if (widget.timeSystem == TimeSystemIds.canada) {
             _blackByoyomiCount--;
 
@@ -637,7 +654,10 @@ class _TimerScreenState extends State<TimerScreen> {
       } else {
         _whiteMoves++;
 
-        if (_whiteMainTime <= 0) {
+        if (_isFischer) {
+          // 🔁 Fischer: her hamlede ana süreye sabit ek süre eklenir (sınırsız)
+          _whiteMainTime += widget.whiteByoyomi;
+        } else if (_whiteMainTime <= 0) {
           if (widget.timeSystem == TimeSystemIds.canada) {
             _whiteByoyomiCount--;
 
@@ -1052,7 +1072,7 @@ class _TimerScreenState extends State<TimerScreen> {
                   );
                   if (hms != null) setState(() => _blackMainTime = hms);
                 }),
-                if (!_isSimple) ...[
+                if (!_isSimple && !_isFischer) ...[
                   timeTile(byoyomiTimeLabel, _blackByoyomiRemaining, () async {
                     final hms = await _showTimePickerLive(
                       context: sheetContext,
@@ -1093,7 +1113,7 @@ class _TimerScreenState extends State<TimerScreen> {
                   );
                   if (hms != null) setState(() => _whiteMainTime = hms);
                 }),
-                if (!_isSimple) ...[
+                if (!_isSimple && !_isFischer) ...[
                   timeTile(byoyomiTimeLabel, _whiteByoyomiRemaining, () async {
                     final hms = await _showTimePickerLive(
                       context: sheetContext,
@@ -1457,7 +1477,13 @@ class _TimerScreenState extends State<TimerScreen> {
     final currentDisplayTime = mainTime > 0 ? mainTime : byoyomiRemaining;
 
     String byoyomiInfo = '';
-    if (!_isSimple && byoyomiCount > 0) {
+    if (_isFischer) {
+      final incSec = isBlack ? widget.blackByoyomi : widget.whiteByoyomi;
+      byoyomiInfo = AppStrings.t(
+        lang,
+        'timerFischerInfo',
+      ).replaceFirst('{seconds}', '$incSec');
+    } else if (!_isSimple && byoyomiCount > 0) {
       final fixedSec = isBlack ? widget.blackByoyomi : widget.whiteByoyomi;
       if (widget.timeSystem == TimeSystemIds.byoyomi) {
         byoyomiInfo = AppStrings.t(lang, 'timerJapanInfo')
@@ -1699,6 +1725,7 @@ class _TimerSettingsScreenState extends State<TimerSettingsScreen> {
   bool get _isSimple => widget.timeSystem == TimeSystemIds.simple;
   bool get _isJapan => widget.timeSystem == TimeSystemIds.byoyomi;
   bool get _isCanada => widget.timeSystem == TimeSystemIds.canada;
+  bool get _isFischer => widget.timeSystem == TimeSystemIds.fischer;
 
   @override
   void initState() {
@@ -1709,6 +1736,10 @@ class _TimerSettingsScreenState extends State<TimerSettingsScreen> {
     } else if (_isCanada) {
       _blackByoCount = 25;
       _whiteByoCount = 25;
+    } else if (_isFischer) {
+      // Fischer için makul varsayılan: +5 sn / hamle
+      _blackByoS = 5;
+      _whiteByoS = 5;
     }
   }
 
@@ -1797,6 +1828,8 @@ class _TimerSettingsScreenState extends State<TimerSettingsScreen> {
         return AppStrings.t(lang, 'byoyomiTitle');
       case TimeSystemIds.canada:
         return AppStrings.t(lang, 'canadaTitle');
+      case TimeSystemIds.fischer:
+        return AppStrings.t(lang, 'fischerTitle');
       case TimeSystemIds.simple:
       default:
         return AppStrings.t(lang, 'simpleTitle');
@@ -1912,7 +1945,9 @@ class _TimerSettingsScreenState extends State<TimerSettingsScreen> {
     required void Function(int) onCountChanged,
   }) {
     final mainLabel = AppStrings.t(lang, 'mainTime');
-    final byoyomiLabel = AppStrings.t(lang, 'byoyomiTime');
+    final byoyomiLabel = _isFischer
+        ? AppStrings.t(lang, 'incrementTime')
+        : AppStrings.t(lang, 'byoyomiTime');
     final canadaLabel = AppStrings.t(lang, 'canadaMoveCount');
     final japanLabel = AppStrings.t(lang, 'japanByoCount');
 

@@ -6,6 +6,7 @@ SYSTÈMES DE TEMPS
 • Byo-yomi japonais — temps principal plus des périodes fixes
 • Byo-yomi canadien — un temps fixe pour un nombre de coups
 • Simple / Mort subite — un seul temps principal
+• Fischer — un incrément fixe ajouté après chaque coup
 
 FONCTIONS
 • Affichage grand et lisible, adapté aux tournois

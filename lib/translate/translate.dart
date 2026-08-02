@@ -16,6 +16,11 @@ class AppStrings {
       'simpleTitle': 'Basit Zaman',
       'simpleDesc': 'Ana Süre (Ek süre yok)',
 
+      'fischerTitle': 'Fischer',
+      'fischerDesc': 'Ana Süre + Her Hamlede Ek Süre',
+      'incrementTime': 'Ek Süre (Her Hamle)',
+      'timerFischerInfo': 'Ek Süre: +{seconds} sn / hamle',
+
       'settingsDifferent': 'Farklı Ayar Kullan',
       'settingsBlack': 'Siyah',
       'settingsWhite': 'Beyaz',
@@ -108,6 +113,11 @@ class AppStrings {
       'simpleTitle': 'Simple Time (Sudden Death)',
       'simpleDesc': 'Main Time (no extra period)',
 
+      'fischerTitle': 'Fischer',
+      'fischerDesc': 'Main Time + Increment Per Move',
+      'incrementTime': 'Increment (Per Move)',
+      'timerFischerInfo': 'Increment: +{seconds}s / move',
+
       'settingsDifferent': 'Use Different Settings',
       'settingsBlack': 'Black',
       'settingsWhite': 'White',
@@ -195,6 +205,11 @@ class AppStrings {
       'simpleTitle': '単純時間',
       'simpleDesc': '持ち時間のみ（追加時間なし）',
 
+      'fischerTitle': 'フィッシャー',
+      'fischerDesc': '持ち時間 + 1手ごとの加算',
+      'incrementTime': '加算時間（1手ごと）',
+      'timerFischerInfo': '加算: +{seconds}秒 / 手',
+
       'settingsDifferent': '別の設定を使用',
       'settingsBlack': '黒番',
       'settingsWhite': '白番',
@@ -243,6 +258,11 @@ class AppStrings {
 
       'simpleTitle': '단순 시간',
       'simpleDesc': '기본 시간만 사용 (추가 시간 없음)',
+
+      'fischerTitle': '피셔',
+      'fischerDesc': '기본 시간 + 착수마다 추가',
+      'incrementTime': '추가 시간(착수마다)',
+      'timerFischerInfo': '추가: +{seconds}초 / 착수',
 
       'settingsDifferent': '흑/백 다른 설정 사용',
       'settingsBlack': '흑',
@@ -293,6 +313,11 @@ class AppStrings {
       'simpleTitle': '简单计时',
       'simpleDesc': '只有基本时间（无追加时间）',
 
+      'fischerTitle': '费舍尔',
+      'fischerDesc': '基本时间 + 每步加时',
+      'incrementTime': '加时（每步）',
+      'timerFischerInfo': '加时: +{seconds}秒 / 步',
+
       'settingsDifferent': '黑白使用不同设置',
       'settingsBlack': '黑方',
       'settingsWhite': '白方',
@@ -340,6 +365,11 @@ class AppStrings {
 
       'simpleTitle': 'Einfache Zeit',
       'simpleDesc': 'Nur Hauptzeit (keine Zusatzzeit)',
+
+      'fischerTitle': 'Fischer',
+      'fischerDesc': 'Grundzeit + Inkrement pro Zug',
+      'incrementTime': 'Inkrement (pro Zug)',
+      'timerFischerInfo': 'Inkrement: +{seconds}s / Zug',
 
       'settingsDifferent': 'Unterschiedliche Einstellungen verwenden',
       'settingsBlack': 'Schwarz',
@@ -425,6 +455,11 @@ class AppStrings {
       'simpleTitle': 'Temps simple',
       'simpleDesc': 'Temps principal uniquement (pas de temps supplémentaire)',
 
+      'fischerTitle': 'Fischer',
+      'fischerDesc': 'Temps principal + incrément par coup',
+      'incrementTime': 'Incrément (par coup)',
+      'timerFischerInfo': 'Incrément : +{seconds}s / coup',
+
       'settingsDifferent': 'Utiliser des réglages différents',
       'settingsBlack': 'Noir',
       'settingsWhite': 'Blanc',
@@ -506,6 +541,11 @@ class AppStrings {
 
       'simpleTitle': 'Tiempo simple',
       'simpleDesc': 'Solo tiempo principal (sin tiempo extra)',
+
+      'fischerTitle': 'Fischer',
+      'fischerDesc': 'Tiempo principal + incremento por jugada',
+      'incrementTime': 'Incremento (por jugada)',
+      'timerFischerInfo': 'Incremento: +{seconds}s / jugada',
 
       'settingsDifferent': 'Usar ajustes diferentes',
       'settingsBlack': 'Negro',
@@ -596,6 +636,11 @@ class AppStrings {
 
       'simpleTitle': 'Tempo semplice',
       'simpleDesc': 'Solo tempo principale (nessun tempo extra)',
+
+      'fischerTitle': 'Fischer',
+      'fischerDesc': 'Tempo principale + incremento per mossa',
+      'incrementTime': 'Incremento (per mossa)',
+      'timerFischerInfo': 'Incremento: +{seconds}s / mossa',
 
       'settingsDifferent': 'Usa impostazioni diverse',
       'settingsBlack': 'Nero',

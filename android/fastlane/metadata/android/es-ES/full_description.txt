@@ -6,6 +6,7 @@ Ya sea una partida de club, una ronda de torneo o entrenamiento en casa, el relo
 • Byo-yomi japonés: tiempo principal más periodos fijos
 • Byo-yomi canadiense: un tiempo fijo para un número de jugadas
 • Simple / Muerte súbita: un único tiempo principal
+• Fischer — un incremento fijo tras cada jugada
 
 ✨ FUNCIONES
 • Pantalla grande y legible, ideal para torneos

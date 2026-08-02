@@ -6,6 +6,7 @@ Whether it's a club game, a tournament round or training at home, Go Baduk Weiqi
 • Japanese Byo-yomi — main time plus a number of fixed periods
 • Canadian Byo-yomi — a fixed time for a set number of moves
 • Simple / Sudden Death — a single main time
+• Fischer — a fixed increment added to your clock after every move
 
 ✨ FEATURES
 • Large, easy-to-read tournament display

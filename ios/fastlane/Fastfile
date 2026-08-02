@@ -21,7 +21,7 @@ platform :ios do
   lane :metadata do
     deliver(
       api_key: asc_api_key,
-      app_version: "2.0.0",
+      app_version: "2.1.0",
       skip_binary_upload: true,
       skip_screenshots: true,
       run_precheck_before_submit: false,
@@ -33,7 +33,7 @@ platform :ios do
   lane :shots do
     deliver(
       api_key: asc_api_key,
-      app_version: "2.0.0",
+      app_version: "2.1.0",
       skip_binary_upload: true,
       skip_metadata: true,
       overwrite_screenshots: true,
