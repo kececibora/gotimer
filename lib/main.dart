@@ -187,7 +187,7 @@ class WarmTimeSystemScreen extends StatelessWidget {
                               children: [
                                 InfoButton(languageCode: lang),
                                 Text(
-                                  'v.2.1.0',
+                                  'v.2.2.0',
                                   style: TextStyle(
                                     fontSize: 10,
                                     color: AppColors.textSecondary.withValues(

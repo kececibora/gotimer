@@ -66,6 +66,10 @@ class LanguageButton extends StatelessWidget {
         return 'ES 🇪🇸';
       case 'it':
         return 'IT 🇮🇹';
+      case 'ru':
+        return 'RU 🇷🇺';
+      case 'th':
+        return 'TH 🇹🇭';
 
       default:
         return code.toUpperCase();

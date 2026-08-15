@@ -89,7 +89,7 @@ class AppThemeController {
           colorScheme: colorScheme,
         ).white.apply(
           fontFamily: 'SF Pro Rounded',
-          fontFamilyFallback: const ['Roboto'],
+          fontFamilyFallback: const ['Roboto', 'NotoSansThai'],
           bodyColor: p.parchmentSoft,
           displayColor: p.parchment,
         );
@@ -128,7 +128,7 @@ class AppThemeController {
         surfaceTintColor: Colors.transparent,
         titleTextStyle: TextStyle(
           fontFamily: 'Cinzel',
-          fontFamilyFallback: const ['SF Pro Rounded', 'Roboto'],
+          fontFamilyFallback: const ['SF Pro Rounded', 'Roboto', 'NotoSansThai'],
           fontSize: 18,
           fontWeight: FontWeight.w800,
           letterSpacing: 0.5,
@@ -151,7 +151,7 @@ class AppThemeController {
         surfaceTintColor: Colors.transparent,
         titleTextStyle: TextStyle(
           fontFamily: 'Cinzel',
-          fontFamilyFallback: const ['SF Pro Rounded', 'Roboto'],
+          fontFamilyFallback: const ['SF Pro Rounded', 'Roboto', 'NotoSansThai'],
           fontWeight: FontWeight.w800,
           fontSize: 18,
           color: p.parchment,
@@ -182,7 +182,7 @@ class AppThemeController {
           elevation: 0,
           textStyle: const TextStyle(
             fontFamily: 'Cinzel',
-            fontFamilyFallback: ['SF Pro Rounded', 'Roboto'],
+            fontFamilyFallback: ['SF Pro Rounded', 'Roboto', 'NotoSansThai'],
             fontWeight: FontWeight.w800,
             letterSpacing: 0.4,
           ),

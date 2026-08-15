@@ -10,7 +10,7 @@ class AppTextStyles {
     double letterSpacing = 0.5,
   }) => TextStyle(
     fontFamily: 'Cinzel',
-    fontFamilyFallback: const ['SF Pro Rounded', 'Roboto'],
+    fontFamilyFallback: const ['SF Pro Rounded', 'Roboto', 'NotoSansThai'],
     fontSize: fontSize,
     fontWeight: FontWeight.w800,
     letterSpacing: letterSpacing,
