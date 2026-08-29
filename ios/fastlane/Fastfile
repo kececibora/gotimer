@@ -44,6 +44,16 @@ platform :ios do
     )
   end
 
+  desc "App Store'daki sürümlerin inceleme durumunu yazdır"
+  lane :review_status do
+    Spaceship::ConnectAPI.token = Spaceship::ConnectAPI::Token.create(**asc_api_key)
+    app = Spaceship::ConnectAPI::App.find("com.borakececi.gotimer")
+    app.get_app_store_versions(filter: { platform: "IOS" }, includes: "build").first(3).each do |v|
+      state = v.app_store_state || v.app_version_state
+      UI.success("DURUM #{v.version_string} | #{state} | build #{v.build&.version || '-'}")
+    end
+  end
+
   desc "TestFlight'taki en son build numarasini yazdir"
   lane :build_status do
     n = latest_testflight_build_number(api_key: asc_api_key, version: APP_VERSION)
