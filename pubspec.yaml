@@ -3,7 +3,7 @@ description: "Go Match Timer — Go/Baduk oyuncuları için tasarlanmış, Byoyo
 
 publish_to: "none"
 
-version: 2.2.0+11
+version: 2.2.1+12
 environment:
   sdk: ^3.10.3
 

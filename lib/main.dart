@@ -1039,98 +1039,117 @@ class _TimerScreenState extends State<TimerScreen> {
                 ),
 
                 const SizedBox(height: AppDimens.gap8),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    liveSettingsTitle,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w800,
-                      color: Colors.white,
+                // İçerik kaydırılabilir: küçük ekranlarda / büyük yazı tipinde
+                // taşmasın, OK butonu her zaman altta erişilebilir kalsın.
+                Flexible(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            liveSettingsTitle,
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w800,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: AppDimens.gap12),
+
+                        // SİYAH
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            blackLabel,
+                            style: const TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w800,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        timeTile(mainTimeLabel, _blackMainTime, () async {
+                          final hms = await _showTimePickerLive(
+                            context: sheetContext,
+                            initialSeconds: _blackMainTime,
+                          );
+                          if (hms != null) setState(() => _blackMainTime = hms);
+                        }),
+                        if (!_isSimple && !_isFischer) ...[
+                          timeTile(
+                            byoyomiTimeLabel,
+                            _blackByoyomiRemaining,
+                            () async {
+                              final hms = await _showTimePickerLive(
+                                context: sheetContext,
+                                initialSeconds: _blackByoyomiRemaining,
+                              );
+                              if (hms != null) {
+                                setState(() => _blackByoyomiRemaining = hms);
+                              }
+                            },
+                          ),
+                          intTile(
+                            countLabel,
+                            _blackByoyomiCount,
+                            0,
+                            99,
+                            (v) => setState(() => _blackByoyomiCount = v),
+                          ),
+                        ],
+
+                        const SizedBox(height: AppDimens.gap12),
+
+                        // BEYAZ
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            whiteLabel,
+                            style: const TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w800,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        timeTile(mainTimeLabel, _whiteMainTime, () async {
+                          final hms = await _showTimePickerLive(
+                            context: sheetContext,
+                            initialSeconds: _whiteMainTime,
+                          );
+                          if (hms != null) setState(() => _whiteMainTime = hms);
+                        }),
+                        if (!_isSimple && !_isFischer) ...[
+                          timeTile(
+                            byoyomiTimeLabel,
+                            _whiteByoyomiRemaining,
+                            () async {
+                              final hms = await _showTimePickerLive(
+                                context: sheetContext,
+                                initialSeconds: _whiteByoyomiRemaining,
+                              );
+                              if (hms != null) {
+                                setState(() => _whiteByoyomiRemaining = hms);
+                              }
+                            },
+                          ),
+                          intTile(
+                            countLabel,
+                            _whiteByoyomiCount,
+                            0,
+                            99,
+                            (v) => setState(() => _whiteByoyomiCount = v),
+                          ),
+                        ],
+                      ],
                     ),
                   ),
                 ),
-                const SizedBox(height: AppDimens.gap12),
-
-                // SİYAH
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    blackLabel,
-                    style: const TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w800,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 6),
-                timeTile(mainTimeLabel, _blackMainTime, () async {
-                  final hms = await _showTimePickerLive(
-                    context: sheetContext,
-                    initialSeconds: _blackMainTime,
-                  );
-                  if (hms != null) setState(() => _blackMainTime = hms);
-                }),
-                if (!_isSimple && !_isFischer) ...[
-                  timeTile(byoyomiTimeLabel, _blackByoyomiRemaining, () async {
-                    final hms = await _showTimePickerLive(
-                      context: sheetContext,
-                      initialSeconds: _blackByoyomiRemaining,
-                    );
-                    if (hms != null) {
-                      setState(() => _blackByoyomiRemaining = hms);
-                    }
-                  }),
-                  intTile(
-                    countLabel,
-                    _blackByoyomiCount,
-                    0,
-                    99,
-                    (v) => setState(() => _blackByoyomiCount = v),
-                  ),
-                ],
-
-                const SizedBox(height: AppDimens.gap12),
-
-                // BEYAZ
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    whiteLabel,
-                    style: const TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w800,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 6),
-                timeTile(mainTimeLabel, _whiteMainTime, () async {
-                  final hms = await _showTimePickerLive(
-                    context: sheetContext,
-                    initialSeconds: _whiteMainTime,
-                  );
-                  if (hms != null) setState(() => _whiteMainTime = hms);
-                }),
-                if (!_isSimple && !_isFischer) ...[
-                  timeTile(byoyomiTimeLabel, _whiteByoyomiRemaining, () async {
-                    final hms = await _showTimePickerLive(
-                      context: sheetContext,
-                      initialSeconds: _whiteByoyomiRemaining,
-                    );
-                    if (hms != null) {
-                      setState(() => _whiteByoyomiRemaining = hms);
-                    }
-                  }),
-                  intTile(
-                    countLabel,
-                    _whiteByoyomiCount,
-                    0,
-                    99,
-                    (v) => setState(() => _whiteByoyomiCount = v),
-                  ),
-                ],
 
                 const SizedBox(height: AppDimens.gap12),
 
@@ -1198,22 +1217,12 @@ class _TimerScreenState extends State<TimerScreen> {
           height: 260,
           child: Column(
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(ctx),
-                    child: Text(cancelLabel),
-                  ),
-                  Text(
-                    pickLabel,
-                    style: const TextStyle(fontWeight: FontWeight.w700),
-                  ),
-                  TextButton(
-                    onPressed: () => Navigator.pop(ctx, h * 3600 + m * 60 + s),
-                    child: Text(okLabel),
-                  ),
-                ],
+              _PickerHeaderBar(
+                cancelLabel: cancelLabel,
+                title: pickLabel,
+                okLabel: okLabel,
+                onCancel: () => Navigator.pop(ctx),
+                onOk: () => Navigator.pop(ctx, h * 3600 + m * 60 + s),
               ),
               const Divider(height: 1),
               Expanded(
@@ -1291,22 +1300,12 @@ class _TimerScreenState extends State<TimerScreen> {
           height: 240,
           child: Column(
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(ctx),
-                    child: Text(cancelLabel),
-                  ),
-                  Text(
-                    pickLabel,
-                    style: const TextStyle(fontWeight: FontWeight.w700),
-                  ),
-                  TextButton(
-                    onPressed: () => Navigator.pop(ctx, selected),
-                    child: Text(okLabel),
-                  ),
-                ],
+              _PickerHeaderBar(
+                cancelLabel: cancelLabel,
+                title: pickLabel,
+                okLabel: okLabel,
+                onCancel: () => Navigator.pop(ctx),
+                onOk: () => Navigator.pop(ctx, selected),
               ),
               const Divider(height: 1),
               Expanded(
@@ -1535,112 +1534,141 @@ class _TimerScreenState extends State<TimerScreen> {
           SafeArea(
             top: isTop,
             bottom: !isTop,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 6,
-                      ),
-                      decoration: BoxDecoration(
-                        color: chipBackground,
-                        borderRadius: BorderRadius.circular(14),
-                        border: Border.all(color: chipBorder),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          _buildStoneMarker(isBlack),
-                          const SizedBox(width: 7),
-                          Text(
-                            playerLabel,
-                            style: TextStyle(
-                              fontWeight: FontWeight.w800,
-                              fontSize: 12,
-                              color: textColor,
+            child: LayoutBuilder(
+              builder: (ctx, constraints) {
+                // Küçük ekranda / büyük sistem yazı tipinde blok taşmasın:
+                // doğal boyutunda sığmıyorsa oranı bozmadan küçültülür.
+                return FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: SizedBox(
+                    width: constraints.maxWidth,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            // Dar ekranda / büyük yazı tipinde satır taşmasın:
+                            // rozetler gerekirse oranı bozmadan küçülür.
+                            Flexible(
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                alignment: Alignment.centerLeft,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 6,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: chipBackground,
+                                    borderRadius: BorderRadius.circular(14),
+                                    border: Border.all(color: chipBorder),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      _buildStoneMarker(isBlack),
+                                      const SizedBox(width: 7),
+                                      Text(
+                                        playerLabel,
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w800,
+                                          fontSize: 12,
+                                          color: textColor,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Flexible(
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                alignment: Alignment.centerRight,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 6,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: chipBackground,
+                                    borderRadius: BorderRadius.circular(14),
+                                    border: Border.all(color: chipBorder),
+                                  ),
+                                  child: Text(
+                                    '$movesLabel: $moves',
+                                    style: AppTextStyles.moveCount.copyWith(
+                                      color: textColor,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 14),
+                        Text(
+                          _formatTime(currentDisplayTime),
+                          style: AppTextStyles.timerBig.copyWith(
+                            color: textColor,
+                            shadows: isActive
+                                ? [
+                                    Shadow(
+                                      color: glow.withValues(alpha: 0.72),
+                                      blurRadius: 18,
+                                    ),
+                                  ]
+                                : null,
+                          ),
+                        ),
+                        if (byoyomiInfo.isNotEmpty) ...[
+                          const SizedBox(height: AppDimens.gap8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 7,
+                            ),
+                            decoration: BoxDecoration(
+                              color: chipBackground,
+                              borderRadius: BorderRadius.circular(14),
+                              border: Border.all(color: chipBorder),
+                            ),
+                            child: Text(
+                              byoyomiInfo,
+                              style: AppTextStyles.byoInfo.copyWith(
+                                color: textColor,
+                              ),
+                              textAlign: TextAlign.center,
                             ),
                           ),
                         ],
-                      ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 6,
-                      ),
-                      decoration: BoxDecoration(
-                        color: chipBackground,
-                        borderRadius: BorderRadius.circular(14),
-                        border: Border.all(color: chipBorder),
-                      ),
-                      child: Text(
-                        '$movesLabel: $moves',
-                        style: AppTextStyles.moveCount.copyWith(
-                          color: textColor,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 14),
-                Text(
-                  _formatTime(currentDisplayTime),
-                  style: AppTextStyles.timerBig.copyWith(
-                    color: textColor,
-                    shadows: isActive
-                        ? [
-                            Shadow(
-                              color: glow.withValues(alpha: 0.72),
-                              blurRadius: 18,
+                        const SizedBox(height: 14),
+                        AnimatedOpacity(
+                          duration: const Duration(milliseconds: 220),
+                          curve: Curves.easeOutCubic,
+                          opacity: isActive ? 1 : 0,
+                          child: Container(
+                            width: 46,
+                            height: 3,
+                            decoration: BoxDecoration(
+                              color: glow,
+                              borderRadius: BorderRadius.circular(99),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: glow.withValues(alpha: 0.72),
+                                  blurRadius: 10,
+                                ),
+                              ],
                             ),
-                          ]
-                        : null,
-                  ),
-                ),
-                if (byoyomiInfo.isNotEmpty) ...[
-                  const SizedBox(height: AppDimens.gap8),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 7,
-                    ),
-                    decoration: BoxDecoration(
-                      color: chipBackground,
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: chipBorder),
-                    ),
-                    child: Text(
-                      byoyomiInfo,
-                      style: AppTextStyles.byoInfo.copyWith(color: textColor),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ],
-                const SizedBox(height: 14),
-                AnimatedOpacity(
-                  duration: const Duration(milliseconds: 220),
-                  curve: Curves.easeOutCubic,
-                  opacity: isActive ? 1 : 0,
-                  child: Container(
-                    width: 46,
-                    height: 3,
-                    decoration: BoxDecoration(
-                      color: glow,
-                      borderRadius: BorderRadius.circular(99),
-                      boxShadow: [
-                        BoxShadow(
-                          color: glow.withValues(alpha: 0.72),
-                          blurRadius: 10,
+                          ),
                         ),
                       ],
                     ),
                   ),
-                ),
-              ],
+                );
+              },
             ),
           ),
         ],
@@ -2140,25 +2168,13 @@ class _TimerSettingsScreenState extends State<TimerSettingsScreen> {
           height: 260,
           child: Column(
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(ctx),
-                    child: Text(cancelLabel),
-                  ),
-                  Text(
-                    pickLabel,
-                    style: const TextStyle(fontWeight: FontWeight.w600),
-                  ),
-                  TextButton(
-                    onPressed: () => Navigator.pop(
-                      ctx,
-                      _Hms(selectedH, selectedM, selectedS),
-                    ),
-                    child: Text(okLabel),
-                  ),
-                ],
+              _PickerHeaderBar(
+                cancelLabel: cancelLabel,
+                title: pickLabel,
+                okLabel: okLabel,
+                onCancel: () => Navigator.pop(ctx),
+                onOk: () =>
+                    Navigator.pop(ctx, _Hms(selectedH, selectedM, selectedS)),
               ),
               const Divider(height: 1),
               Expanded(
@@ -2235,22 +2251,12 @@ class _TimerSettingsScreenState extends State<TimerSettingsScreen> {
           height: 240,
           child: Column(
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(ctx),
-                    child: Text(cancelLabel),
-                  ),
-                  Text(
-                    pickLabel,
-                    style: const TextStyle(fontWeight: FontWeight.w600),
-                  ),
-                  TextButton(
-                    onPressed: () => Navigator.pop(ctx, selected),
-                    child: Text(okLabel),
-                  ),
-                ],
+              _PickerHeaderBar(
+                cancelLabel: cancelLabel,
+                title: pickLabel,
+                okLabel: okLabel,
+                onCancel: () => Navigator.pop(ctx),
+                onOk: () => Navigator.pop(ctx, selected),
               ),
               const Divider(height: 1),
               Expanded(
@@ -2280,6 +2286,57 @@ class _TimerSettingsScreenState extends State<TimerSettingsScreen> {
     final mm = m.toString().padLeft(2, '0');
     final ss = s.toString().padLeft(2, '0');
     return '$hh:$mm:$ss';
+  }
+}
+
+/// Seçici (picker) panellerinin üst barı: İptal / başlık / Tamam.
+/// Dar ekranda veya büyük sistem yazı tipinde satır taşmasın diye üç öğe de
+/// gerekirse oranı bozmadan küçülür — "Tamam" her zaman görünür kalır.
+class _PickerHeaderBar extends StatelessWidget {
+  const _PickerHeaderBar({
+    required this.cancelLabel,
+    required this.title,
+    required this.okLabel,
+    required this.onCancel,
+    required this.onOk,
+  });
+
+  final String cancelLabel;
+  final String title;
+  final String okLabel;
+  final VoidCallback onCancel;
+  final VoidCallback onOk;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Flexible(
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: TextButton(onPressed: onCancel, child: Text(cancelLabel)),
+          ),
+        ),
+        Flexible(
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              title,
+              style: const TextStyle(fontWeight: FontWeight.w700),
+            ),
+          ),
+        ),
+        Flexible(
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerRight,
+            child: TextButton(onPressed: onOk, child: Text(okLabel)),
+          ),
+        ),
+      ],
+    );
   }
 }
 
