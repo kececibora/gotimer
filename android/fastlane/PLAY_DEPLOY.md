@@ -108,3 +108,23 @@ base64 -i android/app/upload-keystore.jks | pbcopy   # macOS: panoya kopyalar
 ## Güvenlik
 - `play-service-account.json`, `*.jks`, `key.properties` **`.gitignore`'da** — asla commit'lenmez.
 - Anahtarlar yalnızca GitHub Secrets ve yerel makinede tutulur.
+
+### Bilinen sorun: GitHub Actions'tan yükleme (29 Ağu 2026)
+
+`deploy-play.yml` calisirken imzalama adimi su hatayla dusuyor:
+
+```
+Failed to read key  from store ".../upload-keystore.jks": Tag number over 30 is not supported
+```
+
+Anahtar adi bos geliyor ve keystore gecerli bir JKS olarak okunamiyor; yani
+`ANDROID_KEYSTORE_BASE64` ve/veya `ANDROID_KEY_ALIAS` repo secret'lari bozuk/eksik.
+Yenilemek icin (yerelde):
+
+```bash
+base64 -i android/app/upload-keystore.jks | pbcopy   # -> ANDROID_KEYSTORE_BASE64
+grep keyAlias android/key.properties                  # -> ANDROID_KEY_ALIAS
+```
+
+Duzelene kadar yayin **yerelden** yapilir: `cd android && bundle exec fastlane deploy track:production`.
+(2.2.1+12 bu sekilde yayinlandi.)
